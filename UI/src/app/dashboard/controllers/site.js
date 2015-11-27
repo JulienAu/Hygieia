@@ -1,3 +1,4 @@
+
 /**
  * Controller for choosing or creating a new dashboard
  */
@@ -27,6 +28,7 @@
         ctrl.open = open;
         ctrl.logout= logout;
         ctrl.admin = admin;
+        ctrl.templateUrl2 = "components/templates/spliview2.html";
         ctrl.templateUrl = "app/dashboard/views/navheader.html";
         ctrl.filterNotOwnedList = filterNotOwnedList;
 
@@ -88,7 +90,7 @@ $cookieStore.remove("username");
 
                 ctrl.mydash.push({
                     id: mydata[x].id,
-                    name: mydata[x].title
+                    name: mydata[x].application.components[0].collectorItems.CodeQuality[0].description
                 });
 
             }
