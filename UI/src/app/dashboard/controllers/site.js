@@ -1,4 +1,3 @@
-
 /**
  * Controller for choosing or creating a new dashboard
  */
@@ -28,7 +27,6 @@
         ctrl.open = open;
         ctrl.logout= logout;
         ctrl.admin = admin;
-        ctrl.templateUrl2 = "components/templates/spliview2.html";
         ctrl.templateUrl = "app/dashboard/views/navheader.html";
         ctrl.filterNotOwnedList = filterNotOwnedList;
 
