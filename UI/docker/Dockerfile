@@ -1,7 +1,7 @@
 
 FROM docker.io/nginx:latest
 
-MAINTAINER Hygieia@capitalone.com
+MAINTAINER julien.audibert@orange.com
 
 
 COPY default.conf /etc/nginx/conf.d/default.conf.templ
