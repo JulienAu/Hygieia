@@ -16,6 +16,7 @@
         var dashboardRoute = '/api/dashboard';
         var mydashboardRoute = "/api/dashboard/mydashboard";
         var myownerRoute = "/api/dashboard/myowner";
+        var myvalueQuality = "/api/quality/static-analysis?componentId="
 
         return {
             search: search,
@@ -42,6 +43,11 @@
         //gets list of owned dashboard
         function mydashboard(username){
           return getPromise(localTesting ? testOwnedRoute : mydashboardRoute+ "/" + username);
+        }
+        
+        //gets list of values
+        function myValuesQuality(componentID){
+          return getPromise(localTesting ? testOwnedRoute : myvaluesQuality+ compomentID+"&max=1");
         }
 
         //gets dashboard owner from dashboard titile
