@@ -6,7 +6,7 @@ MAINTAINER julien.audibert@orange.com
 
 COPY default.conf /etc/nginx/conf.d/default.conf.templ
 COPY conf-builder.sh /usr/bin/conf-builder.sh
-COPY ../target/docker/html /usr/share/nginx/html
+COPY html /usr/share/nginx/html
 
 
 EXPOSE 80 443
