@@ -1,7 +1,7 @@
 
 FROM docker.io/java:openjdk-8-jdk
 
-MAINTAINER Hygieia@capitalone.com
+MAINTAINER julien.audibert@orange.com
 
 
 ENV SPRING_DATA_MONGODB_DATABASE=dashboard
