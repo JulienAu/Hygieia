@@ -29,12 +29,15 @@ ENV LANG C.UTF-8
 ENV JAVA_VERSION 8u45
 ENV JAVA_UBUNTU_VERSION 8u45-b14-1
 
-
+# and https://github.com/docker-library/java/issues/19#issuecomment-70546872
+ENV CA_CERTIFICATES_JAVA_VERSION 20130815
 
 RUN set -x \
 	&& apt-get update \
 	&& apt-get install -y \
-		openjdk-8-jdk="$JAVA_UBUNTU_VERSION"
+		openjdk-8-jdk="$JAVA_UBUNTU_VERSION" \
+		ca-certificates-java="$CA_CERTIFICATES_JAVA_VERSION" \
+	&& rm -rf /var/lib/apt/lists/*
 
 
 ENV SPRING_DATA_MONGODB_DATABASE=dashboard
