@@ -26,13 +26,15 @@ RUN echo 'deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted 
 # Default to UTF-8 file.encoding
 ENV LANG C.UTF-8
 
-ENV JAVA_VERSION 8
+ENV JAVA_VERSION 8u45
+ENV JAVA_UBUNTU_VERSION 8u45-b14-1
+
 
 
 RUN set -x \
 	&& apt-get update \
 	&& apt-get install -y \
-		openjdk-8-jdk
+		openjdk-8-jdk="$JAVA_UBUNTU_VERSION"
 
 
 ENV SPRING_DATA_MONGODB_DATABASE=dashboard
