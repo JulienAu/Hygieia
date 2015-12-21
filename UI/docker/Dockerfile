@@ -1,4 +1,4 @@
-FROM registry-os.prod.vdc.p.fti.net:5000/hebex/ubuntu:14.04
+FROM registry-os.prod.vdc.p.fti.net:443/hebex/ubuntu:14.04
 
 MAINTAINER julien.audibert@orange.com
 
