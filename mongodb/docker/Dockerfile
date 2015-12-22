@@ -48,7 +48,9 @@ RUN set -x \
 	&& apt-get update 
 RUN apt-get install -y \
 		mongodb-org=$MONGO_VERSION \
-		mongodb-org-server=$MONGO_VERSION \
+		mongodb-org-server=$MONGO_VERSION 
+		
+RUN apt-get install -y \
 		mongodb-org-shell=$MONGO_VERSION \
 		mongodb-org-mongos=$MONGO_VERSION \
 		mongodb-org-tools=$MONGO_VERSION
