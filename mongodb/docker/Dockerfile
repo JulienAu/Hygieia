@@ -42,16 +42,16 @@ ENV MONGO_VERSION 3.2.0
 RUN echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/$MONGO_MAJOR multiverse" > /etc/apt/sources.list.d/mongodb-org.list
 
 RUN set -x \
-	&& apt-get update \
-	&& apt-get install -y \
+	&& apt-get update 
+RUN apt-get install -y \
 		mongodb-org=$MONGO_VERSION \
 		mongodb-org-server=$MONGO_VERSION \
 		mongodb-org-shell=$MONGO_VERSION \
 		mongodb-org-mongos=$MONGO_VERSION \
 		mongodb-org-tools=$MONGO_VERSION \
-	&& rm -rf /var/lib/apt/lists/* \
-	&& rm -rf /var/lib/mongodb \
-	&& mv /etc/mongod.conf /etc/mongod.conf.orig
+RUN rm -rf /var/lib/apt/lists/* 
+RUN rm -rf /var/lib/mongodb 
+RUN mv /etc/mongod.conf /etc/mongod.conf.orig
 
 RUN mkdir -p /data/db && chown -R mongodb:mongodb /data/db
 VOLUME /data/db
