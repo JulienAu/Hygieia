@@ -111,7 +111,6 @@
     </activation>
       <modules>
         <module>core</module>
-        <module>api</module>
         <module>jenkins-build-collector</module>
         <module>sonar-codequality-collector</module>
         <module>subversion-scm-collector</module>
@@ -120,7 +119,6 @@
         <module>udeploy-deployment-collector</module>
         <module>jira-feature-collector</module>
         <module>jenkins-cucumber-test-collector</module>
-        <module>UI</module>
       </modules>
       <build>
         <pluginManagement>
@@ -142,7 +140,6 @@
       <id>release</id>
       <modules>
         <module>core</module>
-        <module>api</module>
         <module>jenkins-build-collector</module>
         <module>sonar-codequality-collector</module>
         <module>subversion-scm-collector</module>
