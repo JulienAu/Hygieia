@@ -55,7 +55,7 @@
               <goal>bower</goal>
             </goals>
             <configuration>
-              <arguments>install --allow-root</arguments>
+              <arguments>install</arguments>
             </configuration>
           </execution>
 
