@@ -3,27 +3,24 @@ FROM registry.vdc.test.p.fti.net:5000/hebex/ubuntu:14.04
 
 MAINTAINER julien.audibert@orange.com
 
-RUN apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62
-RUN echo "deb http://nginx.org/packages/mainline/debian/ jessie nginx" >> /etc/apt/sources.list
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10 && \
+    echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.0.list && \
+    apt-get update && \
+    apt-get install -y pwgen mongodb-org mongodb-org-server mongodb-org-shell mongodb-org-mongos mongodb-org-tools && \
+    echo "mongodb-org hold" | dpkg --set-selections && echo "mongodb-org-server hold" | dpkg --set-selections && \
+    echo "mongodb-org-shell hold" | dpkg --set-selections && \
+    echo "mongodb-org-mongos hold" | dpkg --set-selections && \
+    echo "mongodb-org-tools hold" | dpkg --set-selections
 
-ENV NGINX_VERSION 1.9.8-1~jessie
+VOLUME /data/db
 
-RUN apt-get update && \
-    apt-get install -y ca-certificates nginx=${NGINX_VERSION} && \
-    rm -rf /var/lib/apt/lists/*
+ENV AUTH yes
+ENV STORAGE_ENGINE wiredTiger
+ENV JOURNALING yes
 
-# forward request and error logs to docker log collector
-RUN ln -sf /dev/stdout /var/log/nginx/access.log
-RUN ln -sf /dev/stderr /var/log/nginx/error.log
+ADD run.sh /run.sh
+ADD set_mongodb_password.sh /set_mongodb_password.sh
 
-COPY default.conf /etc/nginx/conf.d/default.conf.templ
-COPY conf-builder.sh /usr/bin/conf-builder.sh
-COPY html /usr/share/nginx/html
+EXPOSE 27017 28017
 
-
-VOLUME ["/var/cache/nginx"]
-
-EXPOSE 80 443
-
-CMD conf-builder.sh &&\
-  nginx -g "daemon off;"
+CMD ["/run.sh"]
