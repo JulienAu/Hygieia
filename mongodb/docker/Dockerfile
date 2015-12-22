@@ -6,6 +6,9 @@ MAINTAINER julien.audibert@orange.com
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN groupadd -r mongodb && useradd -r -g mongodb mongodb
 
+RUN touch /etc/apt/sources.list.d/mongodb.list
+RUN echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list
+
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
 		ca-certificates curl \
@@ -43,10 +46,6 @@ RUN echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/$MONGO_MAJOR
 
 RUN dpkg-divert --local --rename --add /sbin/initctl
 RUN ln -s /bin/true /sbin/initctl
-
-
-RUN touch /etc/apt/sources.list.d/mongodb.list
-RUN echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list
 
 RUN set -x \
 	&& apt-get update 
