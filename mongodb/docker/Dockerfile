@@ -48,7 +48,7 @@ RUN apt-get install -y \
 		mongodb-org-server=$MONGO_VERSION \
 		mongodb-org-shell=$MONGO_VERSION \
 		mongodb-org-mongos=$MONGO_VERSION \
-		mongodb-org-tools=$MONGO_VERSION \
+		mongodb-org-tools=$MONGO_VERSION
 RUN rm -rf /var/lib/apt/lists/* 
 RUN rm -rf /var/lib/mongodb 
 RUN mv /etc/mongod.conf /etc/mongod.conf.orig
