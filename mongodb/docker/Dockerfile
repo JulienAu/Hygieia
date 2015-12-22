@@ -41,6 +41,8 @@ ENV MONGO_VERSION 3.2.0
 
 RUN echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/$MONGO_MAJOR multiverse" > /etc/apt/sources.list.d/mongodb-org.list
 
+RUN dpkg-divert --local --rename --add /sbin/initctl
+RUN ln -s /bin/true /sbin/initctl
 RUN set -x \
 	&& apt-get update 
 RUN apt-get install -y \
