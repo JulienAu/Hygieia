@@ -47,6 +47,9 @@ RUN echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/$MONGO_MAJOR
 RUN dpkg-divert --local --rename --add /sbin/initctl
 RUN ln -s /bin/true /sbin/initctl
 
+RUN touch /etc/init.d/mongod
+RUN chmod 755 /etc/init.d/mongod
+
 RUN set -x \
 	&& apt-get update 
 RUN apt-get install -y \
