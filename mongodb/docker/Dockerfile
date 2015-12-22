@@ -39,21 +39,18 @@ RUN set -ex \
 ENV MONGO_MAJOR 3.2
 ENV MONGO_VERSION 3.2.0
 
-RUN touch /etc/init.d/mongodb
-RUN chmod 755 /etc/init.d/mongodb
-
 RUN echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/$MONGO_MAJOR multiverse" > /etc/apt/sources.list.d/mongodb-org.list
 
 RUN set -x \
 	&& apt-get update 
 RUN apt-get install -y \
-		mongodb-org=$MONGO_VERSION \
-		mongodb-org-server=$MONGO_VERSION 
+		mongodb-org=$MONGO_VERSION 
+	#	mongodb-org-server=$MONGO_VERSION 
 		
-RUN apt-get install -y \
-		mongodb-org-shell=$MONGO_VERSION \
-		mongodb-org-mongos=$MONGO_VERSION \
-		mongodb-org-tools=$MONGO_VERSION
+#RUN apt-get install -y \
+#		mongodb-org-shell=$MONGO_VERSION \
+#		mongodb-org-mongos=$MONGO_VERSION \
+#		mongodb-org-tools=$MONGO_VERSION
 RUN rm -rf /var/lib/apt/lists/* 
 RUN rm -rf /var/lib/mongodb 
 RUN mv /etc/mongod.conf /etc/mongod.conf.orig
