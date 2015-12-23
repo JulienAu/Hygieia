@@ -24,27 +24,21 @@ RUN apt-get update && apt-get install -y unzip && rm -rf /var/lib/apt/lists/*
 #RUN echo 'deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse' > /etc/apt/sources.list.d/trusty-backports.list
 
 # Default to UTF-8 file.encoding
-#ENV LANG C.UTF-8
-#ENV JAVA_VERSION 8 
-#ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+ENV LANG C.UTF-8
+ENV JAVA_VERSION 8 
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 # and https://github.com/docker-library/java/issues/19#issuecomment-70546872
 #ENV CA_CERTIFICATES_JAVA_VERSION 20130815
 
-#RUN echo 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main' >> /etc/apt/sources.list && \
- #   echo 'deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main' >> /etc/apt/sources.list && \
-  #  apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C2518248EEA14886 && \
-   # apt-get update && \
-    #echo oracle-java${JAVA_VERSION}-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections && \
-    #apt-get install -y --force-yes --no-install-recommends oracle-java${JAVA_VERSION}-installer oracle-java${JAVA_VERSION}-set-default
-
-# set default java environment variable
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
-
-RUN add-apt-repository ppa:openjdk-r/ppa -y && \
+RUN echo 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main' >> /etc/apt/sources.list && \
+    echo 'deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main' >> /etc/apt/sources.list && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C2518248EEA14886 && \
     apt-get update && \
-    apt-get install -y --no-install-recommends openjdk-8-jdk && \
-    rm -rf /var/lib/apt/lists/*
+    echo oracle-java${JAVA_VERSION}-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections && \
+    apt-get install -y --force-yes --no-install-recommends oracle-java${JAVA_VERSION}-installer oracle-java${JAVA_VERSION}-set-default
+
+
 
 ENV SPRING_DATA_MONGODB_DATABASE=dashboard
 ENV SPRING_DATA_MONGODB_HOST=10.0.1.1
