@@ -17,9 +17,9 @@ import com.capitalone.dashboard.repository.UDeployCollectorRepository;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
@@ -35,306 +35,284 @@ import java.util.Set;
  */
 @Component
 public class UDeployCollectorTask extends CollectorTask<UDeployCollector> {
-	private static final Log LOG = LogFactory
-			.getLog(UDeployCollectorTask.class);
+    @SuppressWarnings({"unused", "PMD.UnusedPrivateField"})
+    private static final Logger LOGGER = LoggerFactory.getLogger(UDeployCollectorTask.class);
 
-	private final UDeployCollectorRepository uDeployCollectorRepository;
-	private final UDeployApplicationRepository uDeployApplicationRepository;
-	private final UDeployClient uDeployClient;
-	private final UDeploySettings uDeploySettings;
+    private final UDeployCollectorRepository uDeployCollectorRepository;
+    private final UDeployApplicationRepository uDeployApplicationRepository;
+    private final UDeployClient uDeployClient;
+    private final UDeploySettings uDeploySettings;
 
-	private final EnvironmentComponentRepository envComponentRepository;
-	private final EnvironmentStatusRepository environmentStatusRepository;
+    private final EnvironmentComponentRepository envComponentRepository;
+    private final EnvironmentStatusRepository environmentStatusRepository;
 
-	private final ComponentRepository dbComponentRepository;
+    private final ComponentRepository dbComponentRepository;
 
-	@Autowired
-	public UDeployCollectorTask(TaskScheduler taskScheduler,
-			UDeployCollectorRepository uDeployCollectorRepository,
-			UDeployApplicationRepository uDeployApplicationRepository,
-			EnvironmentComponentRepository envComponentRepository,
-			EnvironmentStatusRepository environmentStatusRepository,
-			UDeploySettings uDeploySettings, UDeployClient uDeployClient,
-			ComponentRepository dbComponentRepository) {
-		super(taskScheduler, "UDeploy");
-		this.uDeployCollectorRepository = uDeployCollectorRepository;
-		this.uDeployApplicationRepository = uDeployApplicationRepository;
-		this.uDeploySettings = uDeploySettings;
-		this.uDeployClient = uDeployClient;
-		this.envComponentRepository = envComponentRepository;
-		this.environmentStatusRepository = environmentStatusRepository;
-		this.dbComponentRepository = dbComponentRepository;
-	}
+    @Autowired
+    public UDeployCollectorTask(TaskScheduler taskScheduler,
+                                UDeployCollectorRepository uDeployCollectorRepository,
+                                UDeployApplicationRepository uDeployApplicationRepository,
+                                EnvironmentComponentRepository envComponentRepository,
+                                EnvironmentStatusRepository environmentStatusRepository,
+                                UDeploySettings uDeploySettings, UDeployClient uDeployClient,
+                                ComponentRepository dbComponentRepository) {
+        super(taskScheduler, "UDeploy");
+        this.uDeployCollectorRepository = uDeployCollectorRepository;
+        this.uDeployApplicationRepository = uDeployApplicationRepository;
+        this.uDeploySettings = uDeploySettings;
+        this.uDeployClient = uDeployClient;
+        this.envComponentRepository = envComponentRepository;
+        this.environmentStatusRepository = environmentStatusRepository;
+        this.dbComponentRepository = dbComponentRepository;
+    }
 
-	@Override
-	public UDeployCollector getCollector() {
-		return UDeployCollector.prototype(uDeploySettings.getServers());
-	}
+    @Override
+    public UDeployCollector getCollector() {
+        return UDeployCollector.prototype(uDeploySettings.getServers());
+    }
 
-	@Override
-	public BaseCollectorRepository<UDeployCollector> getCollectorRepository() {
-		return uDeployCollectorRepository;
-	}
+    @Override
+    public BaseCollectorRepository<UDeployCollector> getCollectorRepository() {
+        return uDeployCollectorRepository;
+    }
 
-	@Override
-	public String getCron() {
-		return uDeploySettings.getCron();
-	}
+    @Override
+    public String getCron() {
+        return uDeploySettings.getCron();
+    }
 
-	@Override
-	public void collect(UDeployCollector collector) {
-		for (String instanceUrl : collector.getUdeployServers()) {
+    @Override
+    public void collect(UDeployCollector collector) {
+        for (String instanceUrl : collector.getUdeployServers()) {
 
-			logInstanceBanner(instanceUrl);
+            logBanner(instanceUrl);
 
-			long start = System.currentTimeMillis();
+            long start = System.currentTimeMillis();
 
-			clean(collector);
+            clean(collector);
 
-			addNewApplications(uDeployClient.getApplications(instanceUrl),
-					collector);
-			updateData(enabledApplications(collector, instanceUrl));
+            addNewApplications(uDeployClient.getApplications(instanceUrl),
+                    collector);
+            updateData(enabledApplications(collector, instanceUrl));
 
-			log("Finished", start);
-		}
-	}
+            log("Finished", start);
+        }
+    }
 
-	/**
-	 * Clean up unused deployment collector items
-	 *
-	 * @param collector
-	 *            the {@link UDeployCollector}
-	 */
+    /**
+     * Clean up unused deployment collector items
+     *
+     * @param collector the {@link UDeployCollector}
+     */
+    @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
+    private void clean(UDeployCollector collector) {
+        deleteUnwantedJobs(collector);
+        Set<ObjectId> uniqueIDs = new HashSet<ObjectId>();
+        for (com.capitalone.dashboard.model.Component comp : dbComponentRepository
+                .findAll()) {
+            if (comp.getCollectorItems() == null || comp.getCollectorItems().isEmpty()) continue;
+            List<CollectorItem> itemList = comp.getCollectorItems().get(
+                    CollectorType.Deployment);
+            if (itemList == null) continue;
+            for (CollectorItem ci : itemList) {
+                if (ci == null) continue;
+                uniqueIDs.add(ci.getId());
+            }
+        }
+        List<UDeployApplication> appList = new ArrayList<UDeployApplication>();
+        Set<ObjectId> udId = new HashSet<ObjectId>();
+        udId.add(collector.getId());
+        for (UDeployApplication app : uDeployApplicationRepository.findByCollectorIdIn(udId)) {
+            if (app != null) {
+                app.setEnabled(uniqueIDs.contains(app.getId()));
+                appList.add(app);
+            }
+        }
+        uDeployApplicationRepository.save(appList);
+    }
 
-	private void clean(UDeployCollector collector) {
-		Set<ObjectId> uniqueIDs = new HashSet<ObjectId>();
-		for (com.capitalone.dashboard.model.Component comp : dbComponentRepository
-				.findAll()) {
-			if (comp.getCollectorItems() != null && !comp.getCollectorItems().isEmpty()) {
-				List<CollectorItem> itemList = comp.getCollectorItems().get(
-						CollectorType.Deployment);
-				if (itemList != null) {
-					for (CollectorItem ci : itemList) {
-						if (ci != null) {
-							uniqueIDs.add(ci.getId());
-						}
-					}
-				}
-			}
-		}
-		List<UDeployApplication> appList = new ArrayList<UDeployApplication>();
-		Set<ObjectId> udId = new HashSet<ObjectId>();
-		udId.add(collector.getId());
-		for (UDeployApplication app : uDeployApplicationRepository.findByCollectorIdIn(udId)) {
-			if (app != null) {
-				app.setEnabled(uniqueIDs.contains(app.getId()));
-				appList.add(app);
-			}
-		}
-		uDeployApplicationRepository.save(appList);
-	}
+    private void deleteUnwantedJobs(UDeployCollector collector) {
 
-	/**
-	 * For each {@link UDeployApplication}, update the current
-	 * {@link EnvironmentComponent}s and {@link EnvironmentStatus}.
-	 *
-	 * @param uDeployApplications
-	 *            list of {@link UDeployApplication}s
-	 */
-	private void updateData(List<UDeployApplication> uDeployApplications) {
-		/**
-		 * steps - 1. get environments 2. for each environment, get resources
-		 * and non-compliance resources 3. merge resources and non-compliance to
-		 * get component name, versions, resource name, health etc.
-		 */
-		for (UDeployApplication application : uDeployApplications) {
-			long startApp = System.currentTimeMillis();
-			for (Environment environment : uDeployClient
-					.getEnvironments(application)) {
-				List<UDeployEnvResCompData> combinedDataList = uDeployClient
-						.getEnvironmentResourceStatusData(application,
-								environment);
+        List<UDeployApplication> deleteAppList = new ArrayList<>();
+        Set<ObjectId> udId = new HashSet<>();
+        udId.add(collector.getId());
+        for (UDeployApplication app : uDeployApplicationRepository.findByCollectorIdIn(udId)) {
+            if (!collector.getUdeployServers().contains(app.getInstanceUrl()) ||
+                    (!app.getCollectorId().equals(collector.getId()))) {
+                deleteAppList.add(app);
+            }
+        }
 
-				for (UDeployEnvResCompData combinedData : combinedDataList) {
+        uDeployApplicationRepository.delete(deleteAppList);
 
-					EnvironmentComponent component = new EnvironmentComponent();
-					component.setComponentName(combinedData.getComponentName());
-					component.setComponentVersion(combinedData
-							.getComponentVersion());
-					component.setDeployed(combinedData.isDeployed());
-					component.setEnvironmentName(combinedData
-							.getEnvironmentName());
+    }
 
-					component.setEnvironmentName(environment.getName());
-					component.setAsOfDate(combinedData.getAsOfDate());
-					String environmentURL = StringUtils.removeEnd(
-							application.getInstanceUrl(), "/")
-							+ "/#environment/" + environment.getId();
-					component.setEnvironmentUrl(environmentURL);
-					List<EnvironmentComponent> existingComponents = envComponentRepository
-							.findByCollectorItemId(application.getId());
-					EnvironmentComponent existing = findExistingComponent(
-							component, existingComponents);
+    private List<EnvironmentComponent> getEnvironmentComponent(List<UDeployEnvResCompData> dataList, Environment environment, UDeployApplication application) {
+        List<EnvironmentComponent> returnList = new ArrayList<>();
+        for (UDeployEnvResCompData data : dataList) {
+            EnvironmentComponent component = new EnvironmentComponent();
+            component.setComponentName(data.getComponentName());
+            component.setCollectorItemId(data.getCollectorItemId());
+            component.setComponentVersion(data
+                    .getComponentVersion());
+            component.setDeployed(data.isDeployed());
+            component.setEnvironmentName(data
+                    .getEnvironmentName());
 
-					if (existing == null) {
-						// Add new
-						component.setCollectorItemId(application.getId());
-						envComponentRepository.save(component);
-					} else if (changed(component, existing)) {
-						// Update date and deployment status of existing
-						existing.setAsOfDate(component.getAsOfDate());
-						existing.setDeployed(component.isDeployed());
-						existing.setComponentVersion(component.getComponentVersion());
-						envComponentRepository.save(existing);
-					}
-				}
+            component.setEnvironmentName(environment.getName());
+            component.setAsOfDate(data.getAsOfDate());
+            String environmentURL = StringUtils.removeEnd(
+                    application.getInstanceUrl(), "/")
+                    + "/#environment/" + environment.getId();
+            component.setEnvironmentUrl(environmentURL);
 
-				for (UDeployEnvResCompData data : uDeployClient
-						.getEnvironmentResourceStatusData(application,
-								environment)) {
-					EnvironmentStatus status = new EnvironmentStatus();
-					status.setCollectorItemId(data.getCollectorItemId());
-					status.setComponentID(data.getComponentID());
-					status.setComponentName(data.getComponentName());
-					status.setEnvironmentName(data.getEnvironmentName());
-					status.setOnline(data.isOnline());
-					status.setResourceName(data.getResourceName());
-					List<EnvironmentStatus> existingStatuses = environmentStatusRepository
-							.findByCollectorItemId(application.getId());
-					EnvironmentStatus existing = findExistingStatus(status,
-							existingStatuses);
-					if (existing == null) {
-						// Add new
-						status.setCollectorItemId(application.getId());
-						environmentStatusRepository.save(status);
-					} else if (changed(status, existing)) {
-						// Update online status of existing
-						existing.setOnline(status.isOnline());
-						environmentStatusRepository.save(existing);
-					}
-				}
+            returnList.add(component);
+        }
+        return returnList;
+    }
 
-			}
 
-			log(" " + application.getApplicationName(), startApp);
-		}
-	}
+    private List<EnvironmentStatus> getEnvironmentStatus(List<UDeployEnvResCompData> dataList) {
+        List<EnvironmentStatus> returnList = new ArrayList<>();
+        for (UDeployEnvResCompData data : dataList) {
+            EnvironmentStatus status = new EnvironmentStatus();
+            status.setCollectorItemId(data.getCollectorItemId());
+            status.setComponentID(data.getComponentID());
+            status.setComponentName(data.getComponentName());
+            status.setEnvironmentName(data.getEnvironmentName());
+            status.setOnline(data.isOnline());
+            status.setResourceName(data.getResourceName());
 
-	private List<UDeployApplication> enabledApplications(
-			UDeployCollector collector, String instanceUrl) {
-		return uDeployApplicationRepository.findEnabledApplications(
-				collector.getId(), instanceUrl);
-	}
+            returnList.add(status);
+        }
+        return returnList;
+    }
 
-	/**
-	 * Add any new {@link UDeployApplication}s.
-	 *
-	 * @param applications
-	 *            list of {@link UDeployApplication}s
-	 * @param collector
-	 *            the {@link UDeployCollector}
-	 */
-	private void addNewApplications(List<UDeployApplication> applications,
-			UDeployCollector collector) {
-		long start = System.currentTimeMillis();
-		int count = 0;
 
-		log("All apps", start, applications.size());
-		for (UDeployApplication application : applications) {
+    /**
+     * For each {@link UDeployApplication}, update the current
+     * {@link EnvironmentComponent}s and {@link EnvironmentStatus}.
+     *
+     * @param uDeployApplications list of {@link UDeployApplication}s
+     */
+    private void updateData(List<UDeployApplication> uDeployApplications) {
+        for (UDeployApplication application : uDeployApplications) {
+            List<EnvironmentComponent> compList = new ArrayList<>();
+            List<EnvironmentStatus> statusList = new ArrayList<>();
+            long startApp = System.currentTimeMillis();
+            for (Environment environment : uDeployClient
+                    .getEnvironments(application)) {
 
-			if (isNewApplication(collector, application)) {
-				application.setCollectorId(collector.getId());
-				application.setEnabled(false);
-				application.setDescription(application.getApplicationName());
-				try {
-					uDeployApplicationRepository.save(application);
-				} catch (org.springframework.dao.DuplicateKeyException ce) {
-					log("Duplicates items not allowed", 0);
+                List<UDeployEnvResCompData> combinedDataList = uDeployClient
+                        .getEnvironmentResourceStatusData(application,
+                                environment);
 
-				}
-				count++;
-			}
+                compList.addAll(getEnvironmentComponent(combinedDataList, environment, application));
+                statusList.addAll(getEnvironmentStatus(combinedDataList));
+            }
+            if (!compList.isEmpty()) {
+                List<EnvironmentComponent> existingComponents = envComponentRepository
+                        .findByCollectorItemId(application.getId());
+                envComponentRepository.delete(existingComponents);
+                envComponentRepository.save(compList);
+            }
+            if (!statusList.isEmpty()) {
+                List<EnvironmentStatus> existingStatuses = environmentStatusRepository
+                        .findByCollectorItemId(application.getId());
+                environmentStatusRepository.delete(existingStatuses);
+                environmentStatusRepository.save(statusList);
+            }
 
-		}
-		log("New apps", start, count);
-	}
+            log(" " + application.getApplicationName(), startApp);
+        }
+    }
 
-	private boolean isNewApplication(UDeployCollector collector,
-			UDeployApplication application) {
-		return uDeployApplicationRepository.findUDeployApplication(
-				collector.getId(), application.getInstanceUrl(),
-				application.getApplicationId()) == null;
-	}
+    private List<UDeployApplication> enabledApplications(
+            UDeployCollector collector, String instanceUrl) {
+        return uDeployApplicationRepository.findEnabledApplications(
+                collector.getId(), instanceUrl);
+    }
 
-	private boolean changed(EnvironmentStatus status, EnvironmentStatus existing) {
-		return existing.isOnline() != status.isOnline();
-	}
+    /**
+     * Add any new {@link UDeployApplication}s.
+     *
+     * @param applications list of {@link UDeployApplication}s
+     * @param collector    the {@link UDeployCollector}
+     */
+    private void addNewApplications(List<UDeployApplication> applications,
+                                    UDeployCollector collector) {
+        long start = System.currentTimeMillis();
+        int count = 0;
 
-	private EnvironmentStatus findExistingStatus(
-			final EnvironmentStatus proposed,
-			List<EnvironmentStatus> existingStatuses) {
+        log("All apps", start, applications.size());
+        for (UDeployApplication application : applications) {
 
-		return Iterables.tryFind(existingStatuses,
-				new Predicate<EnvironmentStatus>() {
-					@Override
-					public boolean apply(EnvironmentStatus existing) {
-						return existing.getEnvironmentName().equals(
-								proposed.getEnvironmentName())
-								&& existing.getComponentName().equals(
-										proposed.getComponentName())
-								&& existing.getResourceName().equals(
-										proposed.getResourceName());
-					}
-				}).orNull();
-	}
+            if (isNewApplication(collector, application)) {
+                application.setCollectorId(collector.getId());
+                application.setEnabled(false);
+                application.setDescription(application.getApplicationName());
+                try {
+                    uDeployApplicationRepository.save(application);
+                } catch (org.springframework.dao.DuplicateKeyException ce) {
+                    log("Duplicates items not allowed", 0);
 
-	private boolean changed(EnvironmentComponent component,
-			EnvironmentComponent existing) {
-		return existing.isDeployed() != component.isDeployed()
-				|| existing.getAsOfDate() != component.getAsOfDate() || !existing.getComponentVersion().equalsIgnoreCase(component.getComponentVersion());
-	}
+                }
+                count++;
+            }
 
-	private EnvironmentComponent findExistingComponent(
-			final EnvironmentComponent proposed,
-			List<EnvironmentComponent> existingComponents) {
+        }
+        log("New apps", start, count);
+    }
 
-		return Iterables.tryFind(existingComponents,
-				new Predicate<EnvironmentComponent>() {
-					@Override
-					public boolean apply(EnvironmentComponent existing) {
-						return existing.getEnvironmentName().equals(
-								proposed.getEnvironmentName())
-								&& existing.getComponentName().equals(
-										proposed.getComponentName());
+    private boolean isNewApplication(UDeployCollector collector,
+                                     UDeployApplication application) {
+        return uDeployApplicationRepository.findUDeployApplication(
+                collector.getId(), application.getInstanceUrl(),
+                application.getApplicationId()) == null;
+    }
 
-					}
-				}).orNull();
-	}
+    private boolean changed(EnvironmentStatus status, EnvironmentStatus existing) {
+        return existing.isOnline() != status.isOnline();
+    }
 
-	private void log(String marker, long start) {
-		log(marker, start, null);
-	}
+    private EnvironmentStatus findExistingStatus(
+            final EnvironmentStatus proposed,
+            List<EnvironmentStatus> existingStatuses) {
 
-	private void log(String text, long start, Integer count) {
-		long end = System.currentTimeMillis();
-		int maxWidth = 25;
-		String elapsed = ((end - start) / 1000) + "s";
-		String token2 = "";
-		String token3;
-		if (count == null) {
-			token3 = StringUtils.leftPad(elapsed, 30 - text.length());
-		} else {
-			maxWidth = 17;
-			String countStr = count.toString();
-			token2 = StringUtils.leftPad(countStr, 20 - text.length());
-			token3 = StringUtils.leftPad(elapsed, 10);
-		}
-		LOG.info(StringUtils.abbreviate(text, maxWidth) + token2 + token3);
-	}
+        return Iterables.tryFind(existingStatuses,
+                new Predicate<EnvironmentStatus>() {
+                    @Override
+                    public boolean apply(EnvironmentStatus existing) {
+                        return existing.getEnvironmentName().equals(
+                                proposed.getEnvironmentName())
+                                && existing.getComponentName().equals(
+                                proposed.getComponentName())
+                                && existing.getResourceName().equals(
+                                proposed.getResourceName());
+                    }
+                }).orNull();
+    }
 
-	private void logInstanceBanner(String instanceUrl) {
-		LOG.info("------------------------------");
-		LOG.info(instanceUrl);
-		LOG.info("------------------------------");
-	}
+    private boolean changed(EnvironmentComponent component,
+                            EnvironmentComponent existing) {
+        return existing.isDeployed() != component.isDeployed()
+                || existing.getAsOfDate() != component.getAsOfDate() || !existing.getComponentVersion().equalsIgnoreCase(component.getComponentVersion());
+    }
+
+    private EnvironmentComponent findExistingComponent(
+            final EnvironmentComponent proposed,
+            List<EnvironmentComponent> existingComponents) {
+
+        return Iterables.tryFind(existingComponents,
+                new Predicate<EnvironmentComponent>() {
+                    @Override
+                    public boolean apply(EnvironmentComponent existing) {
+                        return existing.getEnvironmentName().equals(
+                                proposed.getEnvironmentName())
+                                && existing.getComponentName().equals(
+                                proposed.getComponentName());
+
+                    }
+                }).orNull();
+    }
 }
