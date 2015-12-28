@@ -124,7 +124,6 @@
         <module>jira-feature-collector</module>
         <module>jenkins-cucumber-test-collector</module>
         <module>chat-ops-collector</module>
-        <module>UI</module>
 
       </modules>
       <build>
