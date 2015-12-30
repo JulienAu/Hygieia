@@ -31,7 +31,7 @@ dbpassword=${SPRING_DATA_MONGODB_PASSWORD:-dbpass}
 sonar.cron=0 0/5 * * * *
 
 #Sonar server(s) (required) - Can provide multiple
-sonar.servers[0]=http://sonar.pic.s1.p.fti.net/
+sonar.servers[0]=${SERVER_URL:-}
 
 #Sonar Metrics
 sonar.metrics=ncloc,line_coverage,violations,critical_violations,major_violations,blocker_violations,sqale_index,test_success_density,test_failures,test_errors,tests
