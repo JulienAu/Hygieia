@@ -9,7 +9,12 @@ import org.bson.types.ObjectId;
  */
 public class CustomObjectMapper extends ObjectMapper {
 
-    public CustomObjectMapper() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public CustomObjectMapper() {
         SimpleModule module = new SimpleModule("ObjectIdModule");
         module.addSerializer(ObjectId.class, new ObjectIdSerializer());
         this.registerModule(module);

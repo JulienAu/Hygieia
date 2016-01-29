@@ -76,9 +76,8 @@ public class HudsonCollectorTask extends CollectorTask<HudsonCollector> {
         clean(collector);
         for (String instanceUrl : collector.getBuildServers()) {
             logBanner(instanceUrl);
-
-            Map<HudsonJob, Set<Build>> buildsByJob = hudsonClient
-                    .getInstanceJobs(instanceUrl);
+            
+            Map<HudsonJob, Set<Build>> buildsByJob = hudsonClient.getInstanceJobs(instanceUrl);
             log("Fetched jobs", start);
 
             addNewJobs(buildsByJob.keySet(), collector);
@@ -157,12 +156,12 @@ public class HudsonCollectorTask extends CollectorTask<HudsonCollector> {
         int count = 0;
 
         for (HudsonJob job : enabledJobs) {
-
+        	
             for (Build buildSummary : nullSafe(buildsByJob.get(job))) {
 
                 if (isNewBuild(job, buildSummary)) {
-                    Build build = hudsonClient.getBuildDetails(buildSummary
-                            .getBuildUrl());
+                	logBanner(job.getJobUrl());
+                    Build build = hudsonClient.getBuildDetails(buildSummary.getBuildUrl(), job.getJobUrl());
                     if (build != null) {
                         build.setCollectorItemId(job.getId());
                         buildRepository.save(build);

@@ -16,4 +16,5 @@ public class DataResponse<T> {
     public long getLastUpdated() {
         return lastUpdated;
     }
+    
 }

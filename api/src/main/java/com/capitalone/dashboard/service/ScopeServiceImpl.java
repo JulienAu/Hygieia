@@ -5,7 +5,6 @@ import com.capitalone.dashboard.repository.CollectorRepository;
 import com.capitalone.dashboard.repository.ComponentRepository;
 import com.capitalone.dashboard.repository.ScopeRepository;
 import com.mysema.query.BooleanBuilder;
-
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,6 +49,7 @@ public class ScopeServiceImpl implements ScopeService {
 	 */
 	@Override
 	public DataResponse<List<Scope>> getAllScopes(ObjectId componentId) {
+		
 		Component component = componentRepository.findOne(componentId);
 		CollectorItem item = component.getCollectorItems()
 				.get(CollectorType.ScopeOwner).get(0);
@@ -59,12 +59,13 @@ public class ScopeServiceImpl implements ScopeService {
 		builder.and(team.collectorItemId.eq(item.getId()));
 
 		// Get all available scopes
-		List<Scope> scope = scopeRepository.findByOrderByProjectPathDesc();
-
+		//List<Scope> scope = scopeRepository.findByOrderByProjectPathDesc();
+		
 		Collector collector = collectorRepository
-				.findOne(item.getCollectorId());
+			.findOne(item.getCollectorId());
 
-		return new DataResponse<>(scope, collector.getLastExecuted());
+		return new DataResponse<>(null /*scope*/, collector.getLastExecuted());
+		
 	}
 
 	/**

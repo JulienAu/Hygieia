@@ -43,7 +43,11 @@
 
         //find dashboard I own
         dashboardData.mydashboard(ctrl.username).then(processDashResponse);
-
+        
+       /* //find values
+        var componentId=dashboardData.mydashboard(ctrl.username).application.components[0].id;
+        dashboardData.myValuesQuality(componentId).then(processDashValues);
+////////////////////////////////////////////////////////////////////////////////////////////////////*/
         function admin() {
             console.log("sending to admin page");
             $location.path("/admin");
@@ -88,13 +92,30 @@ $cookieStore.remove("username");
 
                 ctrl.mydash.push({
                     id: mydata[x].id,
-                    name: mydata[x].application.components[0].collectorItems.CodeQuality[0].description
+                    name: mydata[x].title
+                    
                 });
 
             }
 
         }
+/*        
+        function processDashValues(mydata) {
+            // add values to list
+            ctrl.myvalues = [];
+            for (var x = 0; x < mydata.length; x++) {
 
+                ctrl.myvalues.push({
+                    value: mydata[x].result[0].metrics[0].formattedValue
+                    
+                    
+                });
+
+            }
+
+        }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////*/
+        
 
         function deleteDashboard(id) {
             dashboardData.delete(id).then(function () {
@@ -102,6 +123,8 @@ $cookieStore.remove("username");
                 _.remove(ctrl.mydash, {id: id});
             });
         }
+
+
 
         function filterNotOwnedList(db1, db2) {
 

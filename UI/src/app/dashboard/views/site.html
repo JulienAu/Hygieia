@@ -23,64 +23,28 @@
                         </div>
                     </div>
                 </div>
-
+            </div>
+        </div>
                 <div class="row">
-                    <div class="col-xs-4">
-                        <h5>
-                            All Project's</span>
-                        </h5>
-
-                        <div class="text-center" ng-hide="ctrl.dashboards">Loading
-                            Dashboards...</div>
-
-                        <ul class="list-animate list-group text-left">
-                            <li class="list-group-item clickable"
-                                ng-repeat="myitem in mydashboards = (ctrl.mydash | filter:ctrl.search | orderBy: 'name')">
-                                <a href ng-click="ctrl.open(myitem.id)">{{ myitem.name }} </a> 
-                                 <span class="pull-right fa fa-lg"> <span
-                                    class="fa-angle-right fa-lg"></span>
-                            </span>
-
-                            </li>
+                    <div class="col-xs-4" onload="getProject('api/dashboard/mydashboard/')">
+                            <table id="table" class="sortable" class="hidden">
+                                    <tr>
+                                    <th> Projects</th>
+                                    <th> Lines of code </th>
+                                    <th> Issues(>= Critical) </th>
+                                    <th> Issues(&lt= Major)</th>
+                                    <th> Lines Covered (%) </th>
+                                    <th> Nb tests </th>
+                                    <th> Last Build</th>
+                                </tr>
+                            </table>
                         </ul>
                     </div>
 
-                    <div class="col-xs-4">
-
-                        <table id="table" class="hidden">
-                                    <tr>
-                                    <th> ncloc </th>
-        <th> line_coverage (%) </th>
-        <th> blocker_violations </th>
-        <th> critical_violations </th>
-        <th> major_violations </th>
-        <th> violations</th>
-        <th> tests </th>
-        <th> Last Build</th>
-    </tr>
-</table>
                 </div>
-                </div>
-            </div>
-        </div>
 
-<button onclick="getProject('api/dashboard/mydashboard/');">Get Data</button>
-<!--
-<table id="table" class="hidden">
-    <tr>
-        <th>Name</th>
-        <th>ncloc</th>
-        <th>line_coverage (%)</th>
-        <th>blocker_violations</th>
-        <th>critical_violations </th>
-        <th>major_violations </th>
-        <th>violations</th>
-        <th>tests </th>
-        <th>Last Build</th>
-    </tr>
-</table>
--->
 
+    <button onclick="getProject('api/dashboard/mydashboard/');">Get Data</button>
 
     </div>
 </div>

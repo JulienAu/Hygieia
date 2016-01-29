@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -20,7 +21,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
 import java.util.Arrays;
 
 import static org.hamcrest.Matchers.*;
@@ -33,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {TestConfig.class, WebMVCConfig.class})
 @WebAppConfiguration
 public class BuildControllerTest {
-
     private MockMvc mockMvc;
 
     @Autowired private WebApplicationContext wac;
@@ -60,6 +59,10 @@ public class BuildControllerTest {
                 .andExpect(jsonPath("$result[0].collectorItemId", is(build.getCollectorItemId().toString())))
                 .andExpect(jsonPath("$result[0].timestamp", is(intVal(build.getTimestamp()))))
                 .andExpect(jsonPath("$result[0].number", is(build.getNumber())))
+                .andExpect(jsonPath("$result[0].passCount", is(build.getPassCount())))
+                .andExpect(jsonPath("$result[0].failCount", is(build.getFailCount())))
+                .andExpect(jsonPath("$result[0].totalCount", is(build.getTotalCount())))
+                .andExpect(jsonPath("$result[0].skipCount", is(build.getSkipCount())))
                 .andExpect(jsonPath("$result[0].buildUrl", is(build.getBuildUrl())))
                 .andExpect(jsonPath("$result[0].artifactVersionNumber", is(build.getArtifactVersionNumber())))
                 .andExpect(jsonPath("$result[0].startTime", is(intVal(build.getStartTime()))))
@@ -89,6 +92,10 @@ public class BuildControllerTest {
         build.setNumber("1");
         build.setBuildUrl("buildUrl");
         build.setArtifactVersionNumber("2");
+        build.setPassCount("470");
+        build.setSkipCount("15");
+        build.setFailCount("0");
+        build.setTotalCount("485");
         build.setStartTime(3);
         build.setEndTime(8);
         build.setDuration(5);

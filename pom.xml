@@ -115,6 +115,7 @@
     </activation>
       <modules>
         <module>core</module>
+        <module>api</module>
         <module>jenkins-build-collector</module>
         <module>sonar-codequality-collector</module>
         <module>subversion-scm-collector</module>
@@ -146,6 +147,7 @@
       <id>release</id>
       <modules>
         <module>core</module>
+        <module>api</module>
         <module>jenkins-build-collector</module>
         <module>sonar-codequality-collector</module>
         <module>subversion-scm-collector</module>

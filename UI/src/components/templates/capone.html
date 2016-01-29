@@ -24,34 +24,24 @@
 
     <div class="dashboard-widgets container-fluid" widget-container dashboard="ctrl.dashboard" ng-if="template.widgetView">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-6">
                 <!--<div class="col-sm-6 col-md-12">-->
                     <!--<widget name="nada" widget-title="Feature"></widget>-->
                 <!--</div>-->
                 <!--<div class="col-sm-6 col-md-12">-->
-                <div class="col-xs-12">
-                    <widget name="feature" widget-title="Feature"></widget>
-                    <widget name="repo"></widget>
 
-                </div>
                 <!--</div>-->
+                <widget name="build"></widget>
+                <widget name="build"></widget>
             </div>
 
             <div class="col-md-6">
                 <widget name="build"></widget>
                 <widget name="codeanalysis"></widget>
             </div>
-
-            <div class="col-md-3">
-
-                <div class="col-sm-6 col-md-12">
-                    <widget name="Monitor"></widget>
-                </div>
-
-                <div class="col-sm-6 col-md-12">
-                    <widget name="deploy"></widget>
-                </div>
-
+            <div class="col-md-6">
+                <widget name="build"></widget>
+                <widget name="codeanalysis"></widget>
             </div>
         </div>
     </div>

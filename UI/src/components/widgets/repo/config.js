@@ -19,9 +19,6 @@
 		}, {
 			name: 'Subversion',
 			value: 'Subversion'
-		},{
-			name: 'Stash',
-			value: 'Stash'
 		}];
 
 console.log(JSON.stringify(widgetConfig)); //"{"options":{"id":"repo0"}}"
@@ -113,17 +110,7 @@ console.log(JSON.stringify(widgetConfig)); //"{"options":{"id":"repo0"}}"
 						branch: branch
 					}
 				};
-			} else if (repoTypeName.indexOf("Stash") != -1) {
-
-				item = {
-					collectorId: _.findWhere(ctrl.collectors, {name: 'Stash'}).id,
-					options: {
-						scm: 'Stash',
-						url: url,
-						branch: branch
-					}
-				};
-			}else{
+			} else {
 				console.log(repoTypeName);
 				item = {
 					collectorId : _.findWhere(ctrl.collectors, { name: 'Subversion' }).id,

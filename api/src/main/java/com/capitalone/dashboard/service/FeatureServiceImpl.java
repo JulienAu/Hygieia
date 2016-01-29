@@ -4,7 +4,7 @@ import com.capitalone.dashboard.model.*;
 import com.capitalone.dashboard.repository.CollectorRepository;
 import com.capitalone.dashboard.repository.ComponentRepository;
 import com.capitalone.dashboard.repository.FeatureRepository;
-import com.capitalone.dashboard.util.SuperFeatureComparator;
+//import com.capitalone.dashboard.util.SuperFeatureComparator;
 import com.mysema.query.BooleanBuilder;
 
 import org.bson.types.ObjectId;
@@ -110,12 +110,12 @@ public class FeatureServiceImpl implements FeatureService {
 
 			// Get teamId first from available collector item, based on
 			// component
-			List<Feature> relevantStories = featureRepository.queryByOrderBySStatusDesc(teamId,
-					getCurrentISODateTime());
+			//List<Feature> relevantStories = featureRepository.queryByOrderBySStatusDesc(teamId,
+			//		getCurrentISODateTime());
 
 			Collector collector = collectorRepository.findOne(item.getCollectorId());
 
-			rs = new DataResponse<>(relevantStories, collector.getLastExecuted());
+			rs = new DataResponse<>(/*relevantStories*/ null, collector.getLastExecuted());
 		} catch (NullPointerException e) {
 			long x = 0;
 			Feature f = new Feature();
@@ -152,7 +152,7 @@ public class FeatureServiceImpl implements FeatureService {
 		// Get teamId first from available collector item, based on component
 		List<Feature> relevantFeatureEstimates = featureRepository
 				.getInProgressFeaturesEstimatesByTeamId(teamId, getCurrentISODateTime());
-		Collections.sort(relevantFeatureEstimates, new SuperFeatureComparator());
+		//Collections.sort(relevantFeatureEstimates, new SuperFeatureComparator());
 
 		List<Feature> relevantSuperFeatureEstimates = new ArrayList<Feature>();
 		String lastEpicID = "";

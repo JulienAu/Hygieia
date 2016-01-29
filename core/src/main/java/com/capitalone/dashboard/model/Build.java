@@ -23,9 +23,12 @@ import java.util.List;
 public class Build extends BaseModel {
     private ObjectId collectorItemId;
     private long timestamp;
-
     private String number;
     private String buildUrl;
+	private String failCount = "none";
+    private String skipCount = "none";
+    private String passCount = "none";
+    private String totalCount = "none";
     private String artifactVersionNumber;
     private long startTime;
     private long endTime;
@@ -110,6 +113,38 @@ public class Build extends BaseModel {
     public void setBuildStatus(BuildStatus buildStatus) {
         this.buildStatus = buildStatus;
     }
+    
+    public String getFailCount() {
+		return failCount;
+	}
+
+	public void setFailCount(String failCount) {
+		this.failCount = failCount;
+	}
+
+	public String getSkipCount() {
+		return skipCount;
+	}
+
+	public void setSkipCount(String skipCount) {
+		this.skipCount = skipCount;
+	}
+
+	public String getPassCount() {
+		return passCount;
+	}
+
+	public void setPassCount(String passCount) {
+		this.passCount = passCount;
+	}
+
+	public String getTotalCount() {
+		return totalCount;
+	}
+
+	public void setTotalCount(String totalCount) {
+		this.totalCount = totalCount;
+	}
 
     public String getStartedBy() {
         return startedBy;
@@ -133,5 +168,12 @@ public class Build extends BaseModel {
 
     public void addSourceChangeSet(SCM scm) {
         getSourceChangeSet().add(scm);
+    }
+    
+    @Override
+    public String toString(){
+    	String res ="";
+    	res += this.buildUrl+ "///"+ this.number + "///" + this.totalCount ;
+    	return res;
     }
 }

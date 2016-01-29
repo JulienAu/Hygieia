@@ -28,7 +28,7 @@ public class WebMVCConfig extends WebMvcConfigurerAdapter {
 
         jackson.setObjectMapper(new CustomObjectMapper());
         jackson.getObjectMapper()
-                .disable(SerializationFeature.WRITE_NULL_MAP_VALUES)
+                .enable(SerializationFeature.WRITE_NULL_MAP_VALUES)
                 .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
                 .setSerializationInclusion(JsonInclude.Include.NON_NULL);
 

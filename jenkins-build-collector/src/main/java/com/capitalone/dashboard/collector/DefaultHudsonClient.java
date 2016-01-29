@@ -68,7 +68,15 @@ public class DefaultHudsonClient implements HudsonClient {
             "changeSet[items[" + StringUtils.join(CHANGE_SET_ITEMS_TREE, ",") + "]",
             "revisions[module,revision]]"
     };
-
+    private static final String[] TEST_REPORT = new String[]{
+    		"failCount",
+            "skipCount",
+            "passCount",
+            "totalCount"
+    };
+    
+    private static final String TEST_REPORT_URL = "lastSuccessfulBuild/testReport/api/json?tree="+ StringUtils.join(TEST_REPORT, ",");
+    //private static final String LAST_SUCCESSFUL_URL = "lastSucessfullBuild/api/json?";
     private static final String BUILD_DETAILS_URL_SUFFIX = "/api/json?tree=" + StringUtils.join(BUILD_DETAILS_TREE, ",");
 
     @Autowired
@@ -81,14 +89,12 @@ public class DefaultHudsonClient implements HudsonClient {
     public Map<HudsonJob, Set<Build>> getInstanceJobs(String instanceUrl) {
         Map<HudsonJob, Set<Build>> result = new LinkedHashMap<>();
         try {
-            String url = joinURL(instanceUrl, JOBS_URL_SUFFIX);
+            String url = joinURL(instanceUrl, JOBS_URL_SUFFIX);  
             ResponseEntity<String> responseEntity = makeRestCall(url);
             String returnJSON = responseEntity.getBody();
             JSONParser parser = new JSONParser();
-
             try {
                 JSONObject object = (JSONObject) parser.parse(returnJSON);
-
                 for (Object job : getJsonArray(object, "jobs")) {
                     JSONObject jsonJob = (JSONObject) job;
 
@@ -126,17 +132,24 @@ public class DefaultHudsonClient implements HudsonClient {
     }
 
     @Override
-    public Build getBuildDetails(String buildUrl) {
+    public Build getBuildDetails(String buildUrl, String jobUrl) {
         try {
             String url = joinURL(buildUrl, BUILD_DETAILS_URL_SUFFIX);
+            //String urlSuccess = joinURL(jobUrl, LAST_SUCCESSFUL_URL);
+            String urlTest = joinURL(jobUrl, TEST_REPORT_URL);
             ResponseEntity<String> result = makeRestCall(url);
+            //ResponseEntity<String> resultSuccess = makeRestCall(urlSuccess);
+            ResponseEntity<String> resultTest = makeRestCall(urlTest);
             String returnJSON = result.getBody();
+            //String returnJSONSucess = resultSuccess.getBody();
+            String returnJSONTest = resultTest.getBody();
             JSONParser parser = new JSONParser();
-
+            JSONParser parser2 = new JSONParser();
             try {
                 JSONObject buildJson = (JSONObject) parser.parse(returnJSON);
                 Boolean building = (Boolean) buildJson.get("building");
-
+                //JSONObject buildJsonSucess = (JSONObject) parser.parse(returnJSONSucess);
+                JSONObject buildJsonTest = (JSONObject) parser2.parse(returnJSONTest);
                 // Ignore jobs that are building
                 if (!building) {
                     Build build = new Build();
@@ -150,6 +163,19 @@ public class DefaultHudsonClient implements HudsonClient {
                     build.setStartedBy(firstCulprit(buildJson));
                     if (settings.isSaveLog()) {
                         build.setLog(getLog(buildUrl));
+                    }
+
+                    if(buildJsonTest.get("failCount") != null){
+                    build.setFailCount(buildJsonTest.get("failCount").toString());
+                    }
+                    if(buildJsonTest.get("skipCount") != null){
+                    build.setSkipCount(buildJsonTest.get("skipCount").toString());
+                    }
+                    if(buildJsonTest.get("passCount") != null){
+                    build.setPassCount(buildJsonTest.get("passCount").toString());
+                    }
+                    if(buildJsonTest.get("totalCount") != null){
+                    build.setTotalCount(buildJsonTest.get("totalCount").toString());
                     }
 
                     addChangeSets(build, buildJson);

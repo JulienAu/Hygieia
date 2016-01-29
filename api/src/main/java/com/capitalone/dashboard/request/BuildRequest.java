@@ -17,7 +17,7 @@ public class BuildRequest {
     private Long endDateEnds;
     private Long durationGreaterThan;
     private Long durationLessThan;
-    private List<BuildStatus> buildStatuses = new ArrayList<>();
+	private List<BuildStatus> buildStatuses = new ArrayList<>();
 
     public ObjectId getComponentId() {
         return componentId;
@@ -102,4 +102,5 @@ public class BuildRequest {
     public boolean validDurationRange() {
         return durationGreaterThan != null || durationLessThan != null;
     }
+
 }

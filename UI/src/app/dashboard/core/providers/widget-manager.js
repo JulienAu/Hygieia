@@ -5,7 +5,7 @@
     'use strict';
 
     var widgets = {};
-
+    var k = 1;
     angular
         .module('devops-dashboard.core')
         .provider('widgetManager', widgetManagerProvider);
@@ -29,8 +29,10 @@
         widgetName = widgetName.toLowerCase();
 
         // don't allow widgets to be registered twice
-        if (widgets[widgetName]) {
-            throw new Error(widgetName + ' already registered!');
+       if (widgets[widgetName]) {
+            //throw new Error(widgetName + ' already registered!');
+            k = k+1 ;
+            widgetName = widgetName+"k";
         }
 
         // make sure certain values are set
