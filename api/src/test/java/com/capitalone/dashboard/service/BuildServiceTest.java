@@ -65,8 +65,8 @@ public class BuildServiceTest {
 
         buildService.search(request);
 
-        long endTimeTarget = new LocalDate().minusDays(request.getNumberOfDays()).toDate().getTime();
-        String expectedPredicate = "build.collectorItemId = " + collectorItemId.toString() + " && build.endTime >= " + endTimeTarget;
+        //long endTimeTarget = new LocalDate().minusDays(request.getNumberOfDays()).toDate().getTime();
+        String expectedPredicate = "build.collectorItemId = " + collectorItemId.toString(); //+ " && build.endTime >= " + endTimeTarget;
         verify(buildRepository, times(1)).findAll(argThat(hasPredicate(expectedPredicate)));
     }
 

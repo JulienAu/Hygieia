@@ -1,16 +1,10 @@
 package com.capitalone.dashboard.service;
-
 import com.capitalone.dashboard.model.*;
 import com.capitalone.dashboard.repository.BuildRepository;
 import com.capitalone.dashboard.repository.CollectorRepository;
 import com.capitalone.dashboard.repository.ComponentRepository;
 import com.capitalone.dashboard.request.BuildRequest;
-/*import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;*/
 import com.mysema.query.BooleanBuilder;
-
-//import java.lang.reflect.Field;
-
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class BuildServiceImpl implements BuildService {
 
-	//private static final Logger LOG = LoggerFactory.getLogger(BuildServiceImpl.class);
+	
     private final BuildRepository buildRepository;
     private final ComponentRepository componentRepository;
     private final CollectorRepository collectorRepository;
@@ -38,13 +32,6 @@ public class BuildServiceImpl implements BuildService {
         CollectorItem item = component.getCollectorItems().get(CollectorType.Build).get(0);
 
         QBuild build = new QBuild("build");
-        /*
-        LOG.info("\n\n\n ////////////// class name: " +build.getClass()+ "///////////////////");
-        for (Field field : build.getClass().getDeclaredFields()) {
-			field.setAccessible(true);
-			String name = field.getName();
-			LOG.info("\n\n\n Field name: " +name+ "\n\n\n");
-		}*/
         BooleanBuilder builder = new BooleanBuilder();
 
         builder.and(build.collectorItemId.eq(item.getId()));
@@ -67,8 +54,8 @@ public class BuildServiceImpl implements BuildService {
         if (!request.getBuildStatuses().isEmpty()) {
             builder.and(build.buildStatus.in(request.getBuildStatuses()));
         }
-
+        Iterable<Build> result = buildRepository.findAll(build.collectorItemId.eq(item.getId()));
         Collector collector = collectorRepository.findOne(item.getCollectorId());
-        return new DataResponse<>(buildRepository.findAll(builder.getValue()), collector.getLastExecuted());
+        return new DataResponse<>(result, collector.getLastExecuted());
     }
 }

@@ -103,7 +103,8 @@ public class DashboardServiceImpl implements DashboardService {
         for (ObjectId collectorItemId : collectorItemIds) {
             CollectorItem collectorItem = collectorItemRepository.findOne(collectorItemId);
             Collector collector = collectorRepository.findOne(collectorItem.getCollectorId());
-            if (!incomingTypes.contains(collector.getCollectorType())) {
+            /////////////////////////////////////////////////////////////////
+            //if (!incomingTypes.contains(collector.getCollectorType())) {
                 incomingTypes.add(collector.getCollectorType());
                 List<CollectorItem> cItems = component.getCollectorItems(collector.getCollectorType());
                 if (!CollectionUtils.isEmpty(cItems)) {
@@ -113,7 +114,7 @@ public class DashboardServiceImpl implements DashboardService {
                     }
                 }
                 component.getCollectorItems().remove(collector.getCollectorType());
-            }
+            //}
         }
 
         //Last step: add collector items that came in

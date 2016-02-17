@@ -29,6 +29,8 @@ public class Build extends BaseModel {
     private String skipCount = "none";
     private String passCount = "none";
     private String totalCount = "none";
+    private String numberWarningSeverityCpp;
+    private String numberErrorSeverityCpp ;
     private String artifactVersionNumber;
     private long startTime;
     private long endTime;
@@ -145,8 +147,25 @@ public class Build extends BaseModel {
 	public void setTotalCount(String totalCount) {
 		this.totalCount = totalCount;
 	}
+	
 
-    public String getStartedBy() {
+    public String getNumberWarningSeverityCpp() {
+		return numberWarningSeverityCpp;
+	}
+
+	public void setNumberWarningSeverityCpp(String numberWarningSeverityCpp) {
+		this.numberWarningSeverityCpp = numberWarningSeverityCpp;
+	}
+
+	public String getNumberErrorSeverityCpp() {
+		return numberErrorSeverityCpp;
+	}
+
+	public void setNumberErrorSeverityCpp(String numberErrorSeverityCpp) {
+		this.numberErrorSeverityCpp = numberErrorSeverityCpp;
+	}
+
+	public String getStartedBy() {
         return startedBy;
     }
 
