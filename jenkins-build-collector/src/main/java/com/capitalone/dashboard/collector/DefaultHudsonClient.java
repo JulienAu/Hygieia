@@ -322,6 +322,7 @@ public class DefaultHudsonClient implements HudsonClient {
 			makeRestCall(sUrl);
 			return true;
 		} catch (HttpClientErrorException rce) {
+			LOG.info("Metrics Not found");
 			return false;
 		} catch (MalformedURLException mfe) {
 			return false;

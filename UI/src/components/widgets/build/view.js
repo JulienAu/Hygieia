@@ -260,6 +260,9 @@
 
                     _.times(15, function () {
                         var count = grouped[dt.getTime()] ? grouped[dt.getTime()].length : 0;
+                   /* for (var x = 0; x <= data.length; x++) {
+                        var count = parseInt(data[x].passCount);
+                        counts.push(count);*/
                         counts.push(count);
                         dt.setDate(dt.getDate() + 1);
                     });

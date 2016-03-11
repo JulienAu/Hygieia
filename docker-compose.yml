@@ -23,3 +23,10 @@ hygieia-ui:
   - "80:80"
   links:
   - hygieia-api
+mongo-express:
+  image: knickers/mongo-express
+  container_name: mongo-express
+  ports:
+  - "8081:8081"
+  links:
+  - mongodb:mongo

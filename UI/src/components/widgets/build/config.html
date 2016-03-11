@@ -53,4 +53,40 @@
             <button type="submit" class="btn btn-primary btn-wide">Save</button>
         </div>
     </form>
-</widget-modal>
+</widget-modal> 
+<!--
+<widget-modal widget-modal-title="Configure Build Widget" class="build-config">
+    <form name="configForm" role="form" ng-submit="buildConfig.submit(configForm.$valid)" novalidate="novalidate">
+        <div class="form-group text-center" ng-class="{'has-error': configForm.collectorItemId.$invalid && buildConfig.submitted}">
+            <select name="collectorItemId"
+                    class="form-control"
+                    ng-model="buildConfig.collectorItemId"
+                    ng-options="item.name for item in buildConfig.buildJobs | orderBy: 'name' track by item.value"
+                    ng-disabled="buildConfig.toolsDropdownDisabled"
+                    required>
+                <option value="">{{buildConfig.toolsDropdownPlaceholder}}</option>
+            </select>
+
+            <p class="help-block" ng-if="configForm.collectorItemId.$error.required">Please select a collector</p>
+        </div>
+
+       <div class="form-group text-center" ng-class="{'has-error': configForm.collectorItemId1.$invalid && buildConfig.submitted}">
+            <select name="collectorItemId1"
+                    class="form-control"
+                    ng-model="buildConfig.collectorItemId1"
+                    ng-options="item.name for item in buildConfig.buildJobs | orderBy: 'name' track by item.value"
+                    ng-disabled="buildConfig.toolsDropdownDisabled"
+                    required>
+                <option value="">{{buildConfig.toolsDropdownPlaceholder}}</option>
+            </select>
+
+            <p class="help-block" ng-if="configForm.collectorItemId1.$error.required">Please select a collector</p>
+        </div>
+
+       
+
+        <div class="button-row row text-center">
+            <button type="submit" class="btn btn-primary btn-wide">Save</button>
+        </div>
+    </form>
+</widget-modal> -->

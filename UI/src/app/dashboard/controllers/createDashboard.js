@@ -38,7 +38,7 @@
             ctrl.submitted = true;
 
             //Get the signed in user from the cookie store
-           ctrl.owner=$cookies.username;
+            ctrl.owner=$cookies.username;
             console.log("Owner in dashboard is"+ ctrl.owner);
 
             // perform basic validation and send to the api
