@@ -15,7 +15,7 @@ public enum CollectorType {
     Test,
     StaticSecurityScan,
     ChatOps,
-    Cloud;
+    Cloud, Build2;
 
     public static CollectorType fromString(String value) {
         for (CollectorType collectorType : values()) {

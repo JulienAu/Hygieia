@@ -25,6 +25,10 @@ public class TestConfig {
 	public BuildService buildService() {
 		return Mockito.mock(BuildService.class);
 	}
+	@Bean
+	public Build2Service build2Service() {
+		return Mockito.mock(Build2Service.class);
+	}
 
 	@Bean
 	public CollectorService collectorService() {

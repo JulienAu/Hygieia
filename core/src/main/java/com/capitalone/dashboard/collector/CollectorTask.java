@@ -10,6 +10,9 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -60,7 +63,11 @@ public abstract class CollectorTask<T extends Collector> implements Runnable {
 
         if (collector.isEnabled()) {
             // Do collection run
-            collect(collector);
+            try {
+				collect(collector);
+			} catch (IOException e) {
+				LOGGER.info("Collect not possible");
+			}
 
             // Update lastUpdate timestamp in Collector
             collector.setLastExecuted(System.currentTimeMillis());
@@ -85,7 +92,7 @@ public abstract class CollectorTask<T extends Collector> implements Runnable {
 
     public abstract String getCron();
 
-    public abstract void collect(T collector);
+    public abstract void collect(T collector) throws MalformedURLException, IOException;
 
     private void setOnline(boolean online) {
         T collector = getCollectorRepository().findByName(collectorName);
