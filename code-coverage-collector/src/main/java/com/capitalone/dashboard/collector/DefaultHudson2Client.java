@@ -106,7 +106,12 @@ public class DefaultHudson2Client implements Hudson2Client {
 
 	@Override
 	public Build2 getBuildDetails(String buildUrl, String jobUrl) throws IOException {
-		String url = joinURL(buildUrl, JOBS_URL_DETAILS);
+		String[] urlWithoutBuild = buildUrl.split("/");
+		String urlWB ="http:";
+		for (int i = 1 ; i<urlWithoutBuild.length-1 ; i++){
+			urlWB = urlWB+"/"+urlWithoutBuild[i];
+		}
+		String url = joinURL(urlWB, JOBS_URL_DETAILS);
 		List<String> codeCoverage = codeCoverage(url);
 		Build2 build = new Build2();
 		build.setLineCoverage(codeCoverage.get(0));

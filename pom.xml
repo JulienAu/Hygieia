@@ -125,7 +125,7 @@
         <module>jira-feature-collector</module>
         <module>jenkins-cucumber-test-collector</module>
         <module>chat-ops-collector</module>
-
+        <module>code-coverage-collector</module>
       </modules>
       <build>
         <pluginManagement>
@@ -157,6 +157,7 @@
         <module>jira-feature-collector</module>
         <module>jenkins-cucumber-test-collector</module>
         <module>chat-ops-collector</module>
+        <module>code-coverage-collector</module>
       </modules>
       <build>
         <plugins>

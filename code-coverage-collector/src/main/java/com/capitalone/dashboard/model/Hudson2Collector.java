@@ -19,7 +19,7 @@ public class Hudson2Collector extends Collector {
 
     public static Hudson2Collector prototype(List<String> buildServers) {
         Hudson2Collector protoType = new Hudson2Collector();
-        protoType.setName("HudsonCodeCoverage");
+        protoType.setName("Hudson2");
         protoType.setCollectorType(CollectorType.Build2);
         protoType.setOnline(true);
         protoType.setEnabled(true);
