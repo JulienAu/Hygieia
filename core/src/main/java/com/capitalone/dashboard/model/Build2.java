@@ -25,6 +25,9 @@ public class Build2 extends BaseModel {
 	private String lineCoverage;
     private String functionCoverage;
     private String branchCoverage;
+	private String lineCoverageUnitaire;
+    private String functionCoverageUnitaire;
+    private String branchCoverageUnitaire;
     private String buildUrl;
    
   
@@ -67,8 +70,32 @@ public class Build2 extends BaseModel {
 		this.branchCoverage = branchCoverage;
 	}
 
+	
+    public String getLineCoverageUnitaire() {
+		return lineCoverageUnitaire;
+	}
 
-    public long getTimestamp() {
+	public void setLineCoverageUnitaire(String lineCoverageUnitaire) {
+		this.lineCoverageUnitaire = lineCoverageUnitaire;
+	}
+
+	public String getFunctionCoverageUnitaire() {
+		return functionCoverageUnitaire;
+	}
+
+	public void setFunctionCoverageUnitaire(String functionCoverageUnitaire) {
+		this.functionCoverageUnitaire = functionCoverageUnitaire;
+	}
+
+	public String getBranchCoverageUnitaire() {
+		return branchCoverageUnitaire;
+	}
+
+	public void setBranchCoverageUnitaire(String branchCoverageUnitaire) {
+		this.branchCoverageUnitaire = branchCoverageUnitaire;
+	}
+
+	public long getTimestamp() {
         return timestamp;
     }
 

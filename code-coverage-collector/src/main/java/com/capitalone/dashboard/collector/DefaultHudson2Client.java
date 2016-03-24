@@ -50,8 +50,9 @@ public class DefaultHudson2Client implements Hudson2Client {
 
 	private static final String JOBS_URL_SUFFIX = "/api/json?tree=jobs[name,url,builds[number,url]]";
 	private static final String JOBS_URL_DETAILS = "/Functional_Coverage/index.html";
+	private static final String JOBS_URL_DETAILS_UNITAIRE = "/UT_Coverage/index.html";
 
-	
+
 	@Autowired
 	public DefaultHudson2Client(Supplier<RestOperations> restOperationsSupplier, Hudson2Settings settings) {
 		this.rest = restOperationsSupplier.get();
@@ -112,23 +113,35 @@ public class DefaultHudson2Client implements Hudson2Client {
 			urlWB = urlWB+"/"+urlWithoutBuild[i];
 		}
 		String url = joinURL(urlWB, JOBS_URL_DETAILS);
+		String url2 = joinURL(urlWB, JOBS_URL_DETAILS_UNITAIRE);
 		List<String> codeCoverage = codeCoverage(url);
+		List<String> codeCoverageUnitaire = codeCoverage(url2);
 		Build2 build = new Build2();
-		build.setLineCoverage(codeCoverage.get(0));
-		build.setFunctionCoverage(codeCoverage.get(1));
-		build.setBranchCoverage(codeCoverage.get(2));
+		if(!codeCoverage.isEmpty()){
+			build.setLineCoverage(codeCoverage.get(0));
+			build.setFunctionCoverage(codeCoverage.get(1));
+			build.setBranchCoverage(codeCoverage.get(2));
+		}
+		if(!codeCoverageUnitaire.isEmpty()){
+			build.setLineCoverageUnitaire(codeCoverageUnitaire.get(0));
+			build.setFunctionCoverageUnitaire(codeCoverageUnitaire.get(1));
+			build.setBranchCoverageUnitaire(codeCoverageUnitaire.get(2));
+		}
+		build.setNumber(urlWithoutBuild[urlWithoutBuild.length-1]);
+		build.setBuildUrl(buildUrl);
+		build.setTimestamp(System.currentTimeMillis());
 		return build;
-		
+
 	}
 
-	
+
 
 
 	private String getString(JSONObject json, String key) {
 		return (String) json.get(key);
 	}
 
-	
+
 
 	private JSONArray getJsonArray(JSONObject json, String key) {
 		Object array = json.get(key);
@@ -139,7 +152,7 @@ public class DefaultHudson2Client implements Hudson2Client {
 
 
 
-	
+
 
 	/* Function name need to be changed */
 	protected boolean cppCheck(String sUrl){
@@ -207,18 +220,22 @@ public class DefaultHudson2Client implements Hudson2Client {
 		}
 		return result.toString();
 	}
-	
+
 	private List<String> codeCoverage(String url) throws IOException{
 		ArrayList<String> res = new ArrayList<String>();
 		//Document doc = Jsoup.parse(input , "UTF-8");
-		Document doc = Jsoup.connect(url).get();
-		Element elementsByTag = doc.getElementsByTag("body").get(0);
-		Elements rows = elementsByTag.getElementsByTag("td");
-		for(Element row : rows) {
-			String test = row.text();
-			if (test.matches("[0-9]+.[0-9]+ %")){
-				res.add(test);
+		try{
+			Document doc = Jsoup.connect(url).get();
+			Element elementsByTag = doc.getElementsByTag("body").get(0);
+			Elements rows = elementsByTag.getElementsByTag("td");
+			for(Element row : rows) {
+				String test = row.text();
+				if (test.matches("[0-9]+.[0-9]+ %")){
+					res.add(test);
+				}
 			}
+		} catch (IOException e) {
+			LOG.info("No codeCoverage");
 		}
 		return res;
 	}
