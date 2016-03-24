@@ -61,7 +61,8 @@ public class DashboardController {
         return ResponseEntity.ok("Updated");
     }
 
-    @RequestMapping(value = "/dashboard/{id}", method = DELETE)
+    @SuppressWarnings("rawtypes")
+	@RequestMapping(value = "/dashboard/{id}", method = DELETE)
     public ResponseEntity deleteDashboard(@PathVariable ObjectId id) {
         dashboardService.delete(id);
         return ResponseEntity.noContent().build();

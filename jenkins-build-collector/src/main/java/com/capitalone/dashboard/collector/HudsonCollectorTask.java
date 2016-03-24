@@ -28,9 +28,6 @@ import java.util.Set;
  */
 @Component
 public class HudsonCollectorTask extends CollectorTask<HudsonCollector> {
-    @SuppressWarnings("PMD.UnusedPrivateField")
-//    private static final Log LOG = LogFactory.getLog(HudsonCollectorTask.class);
-
     private final HudsonCollectorRepository hudsonCollectorRepository;
     private final HudsonJobRepository hudsonJobRepository;
     private final BuildRepository buildRepository;
@@ -95,7 +92,6 @@ public class HudsonCollectorTask extends CollectorTask<HudsonCollector> {
      * @param collector the {@link HudsonCollector}
      */
 
-    @SuppressWarnings("PMD.UnnecessaryFullyQualifiedName")
     private void clean(HudsonCollector collector) {
 
         // First delete jobs that will be no longer collected because servers have moved etc.

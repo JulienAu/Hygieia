@@ -1,5 +1,6 @@
 package com.capitalone.dashboard.util;
 
+@SuppressWarnings("serial")
 public class EncryptionException extends Exception {
 
     /**

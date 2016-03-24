@@ -56,7 +56,8 @@ public class MarkdownTest {
         return new File(".").getAbsoluteFile().getParentFile().getParentFile();
     }
 
-    CharSequence fromFile(String filename) throws IOException {
+    @SuppressWarnings("resource")
+	CharSequence fromFile(String filename) throws IOException {
         try (FileChannel channel = new FileInputStream(filename).getChannel()) {
             ByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, (int) channel.size());
             return Charset.forName("8859_1").newDecoder().decode(buffer);

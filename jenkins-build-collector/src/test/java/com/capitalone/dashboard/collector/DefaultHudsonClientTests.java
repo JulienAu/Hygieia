@@ -77,7 +77,8 @@ public class DefaultHudsonClientTests {
 
     @Test
     public void verifyBasicAuth() throws Exception {
-        URL u = new URL(new URL("http://jenkins.com"), "/api/json?tree=jobs[name,url," +
+        @SuppressWarnings("unused")
+		URL u = new URL(new URL("http://jenkins.com"), "/api/json?tree=jobs[name,url," +
                 "builds[number,url]]");
 
         HttpHeaders headers = defaultHudsonClient.createHeaders("Aladdin:open sesame");
@@ -85,9 +86,11 @@ public class DefaultHudsonClientTests {
                 headers.getFirst(HttpHeaders.AUTHORIZATION));
     }
 
-    @Test
+    @SuppressWarnings("unchecked")
+	@Test
     public void verifyAuthCredentials() throws Exception {
-        HttpEntity headers = new HttpEntity(defaultHudsonClient.createHeaders("user:pass"));
+        @SuppressWarnings("rawtypes")
+		HttpEntity headers = new HttpEntity(defaultHudsonClient.createHeaders("user:pass"));
         when(rest.exchange(Matchers.any(URI.class), eq(HttpMethod.GET),
                 eq(headers), eq(String.class)))
                 .thenReturn(new ResponseEntity<>("", HttpStatus.OK));
@@ -99,9 +102,11 @@ public class DefaultHudsonClientTests {
                 eq(headers), eq(String.class));
     }
 
-    @Test
+    @SuppressWarnings("rawtypes")
+	@Test
     public void verifyAuthCredentialsBySettings() throws Exception {
-        HttpEntity headers = new HttpEntity(defaultHudsonClient.createHeaders("does:matter"));
+        @SuppressWarnings("unchecked")
+		HttpEntity headers = new HttpEntity(defaultHudsonClient.createHeaders("does:matter"));
         when(rest.exchange(Matchers.any(URI.class), eq(HttpMethod.GET),
                 eq(headers), eq(String.class)))
                 .thenReturn(new ResponseEntity<>("", HttpStatus.OK));
@@ -113,7 +118,8 @@ public class DefaultHudsonClientTests {
                 eq(headers), eq(String.class));
     }
 
-    @Test
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@Test
     public void verifyGetLogUrl() throws Exception {
         HttpEntity headers = new HttpEntity(defaultHudsonClient.createHeaders("does:matter"));
         when(rest.exchange(Matchers.any(URI.class), eq(HttpMethod.GET),

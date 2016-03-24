@@ -61,7 +61,6 @@ public class ChatOpsCollectorTask extends CollectorTask<Collector> {
         return chatOpsSettings.getCron();
     }
 
-    @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts") // agreed, fixme
     private void clean(Collector collector) {
         Set<ObjectId> uniqueIDs = new HashSet<ObjectId>();
 
@@ -111,10 +110,6 @@ public class ChatOpsCollectorTask extends CollectorTask<Collector> {
             log("Finished", start);
 
         }
-    }
-
-    private DateTime lastUpdated(ChatOpsRepo repo) {
-        return repo.getLastUpdateTime();
     }
 
     private List<ChatOpsRepo> enabledRepos(Collector collector) {

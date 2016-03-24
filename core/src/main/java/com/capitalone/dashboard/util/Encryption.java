@@ -7,7 +7,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
-@SuppressWarnings("PMD.AvoidCatchingNPE") // TODO:...
 public final class Encryption {
 
     private static final String ALGO = "DESede";
@@ -117,7 +116,7 @@ public final class Encryption {
         return decryptedMessage;
     }
 
-    @SuppressWarnings({"PMD.SystemPrintln", "PMD.AvoidPrintStackTrace"})
+
     public static void main(String[] args) {
         try {
             String k = Encryption.getStringKey();

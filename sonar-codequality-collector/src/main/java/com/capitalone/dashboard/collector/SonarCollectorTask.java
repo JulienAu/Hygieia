@@ -10,8 +10,6 @@ import com.capitalone.dashboard.repository.CodeQualityRepository;
 import com.capitalone.dashboard.repository.ComponentRepository;
 import com.capitalone.dashboard.repository.SonarCollectorRepository;
 import com.capitalone.dashboard.repository.SonarProjectRepository;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
@@ -24,9 +22,6 @@ import java.util.Set;
 
 @Component
 public class SonarCollectorTask extends CollectorTask<SonarCollector> {
-    @SuppressWarnings("PMD.UnusedPrivateField")
-    private static final Log LOG = LogFactory.getLog(SonarCollectorTask.class);
-
     private final SonarCollectorRepository sonarCollectorRepository;
     private final SonarProjectRepository sonarProjectRepository;
     private final CodeQualityRepository codeQualityRepository;
@@ -99,8 +94,7 @@ public class SonarCollectorTask extends CollectorTask<SonarCollector> {
 	 *            the {@link HudsonCollector}
 	 */
 
-    @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts") // agreed PMD, fixme
-	private void clean(SonarCollector collector) {
+    private void clean(SonarCollector collector) {
 		Set<ObjectId> uniqueIDs = new HashSet<>();
 		for (com.capitalone.dashboard.model.Component comp : dbComponentRepository
 				.findAll()) {
