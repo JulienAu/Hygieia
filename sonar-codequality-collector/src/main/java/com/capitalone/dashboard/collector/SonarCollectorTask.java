@@ -22,69 +22,69 @@ import java.util.Set;
 
 @Component
 public class SonarCollectorTask extends CollectorTask<SonarCollector> {
-    private final SonarCollectorRepository sonarCollectorRepository;
-    private final SonarProjectRepository sonarProjectRepository;
-    private final CodeQualityRepository codeQualityRepository;
-    private final SonarClient sonarClient;
-    private final SonarSettings sonarSettings;
-    private final ComponentRepository dbComponentRepository;
-    private final static int CLEANUP_INTERVAL = 3600000;
+	private final SonarCollectorRepository sonarCollectorRepository;
+	private final SonarProjectRepository sonarProjectRepository;
+	private final CodeQualityRepository codeQualityRepository;
+	private final SonarClient sonarClient;
+	private final SonarSettings sonarSettings;
+	private final ComponentRepository dbComponentRepository;
+	private final static int CLEANUP_INTERVAL = 3600000;
 
-    @Autowired
-    public SonarCollectorTask(TaskScheduler taskScheduler,
-                              SonarCollectorRepository sonarCollectorRepository,
-                              SonarProjectRepository sonarProjectRepository,
-                              CodeQualityRepository codeQualityRepository,
-                              SonarSettings sonarSettings,
-                              SonarClient sonarClient,
-                              ComponentRepository dbComponentRepository) {
-        super(taskScheduler, "Sonar");
-        this.sonarCollectorRepository = sonarCollectorRepository;
-        this.sonarProjectRepository = sonarProjectRepository;
-        this.codeQualityRepository = codeQualityRepository;
-        this.sonarSettings = sonarSettings;
-        this.sonarClient = sonarClient;
-        this.dbComponentRepository = dbComponentRepository;
-    }
+	@Autowired
+	public SonarCollectorTask(TaskScheduler taskScheduler,
+			SonarCollectorRepository sonarCollectorRepository,
+			SonarProjectRepository sonarProjectRepository,
+			CodeQualityRepository codeQualityRepository,
+			SonarSettings sonarSettings,
+			SonarClient sonarClient,
+			ComponentRepository dbComponentRepository) {
+		super(taskScheduler, "Sonar");
+		this.sonarCollectorRepository = sonarCollectorRepository;
+		this.sonarProjectRepository = sonarProjectRepository;
+		this.codeQualityRepository = codeQualityRepository;
+		this.sonarSettings = sonarSettings;
+		this.sonarClient = sonarClient;
+		this.dbComponentRepository = dbComponentRepository;
+	}
 
-    @Override
-    public SonarCollector getCollector() {
-        return SonarCollector.prototype(sonarSettings.getServers());
-    }
+	@Override
+	public SonarCollector getCollector() {
+		return SonarCollector.prototype(sonarSettings.getServers());
+	}
 
-    @Override
-    public BaseCollectorRepository<SonarCollector> getCollectorRepository() {
-        return sonarCollectorRepository;
-    }
+	@Override
+	public BaseCollectorRepository<SonarCollector> getCollectorRepository() {
+		return sonarCollectorRepository;
+	}
 
-    @Override
-    public String getCron() {
-        return sonarSettings.getCron();
-    }
+	@Override
+	public String getCron() {
+		return sonarSettings.getCron();
+	}
 
-    @Override
-    public void collect(SonarCollector collector) {
-        long start = System.currentTimeMillis();
+	@Override
+	public void collect(SonarCollector collector) {
+		long start = System.currentTimeMillis();
 
 		// Clean up every hour
 		if ((start - collector.getLastExecuted()) > CLEANUP_INTERVAL) {
 			clean(collector);
 		}
-        for (String instanceUrl : collector.getSonarServers()) {
-            logBanner(instanceUrl);
+		for (String instanceUrl : collector.getSonarServers()) {
+			logBanner(instanceUrl);
 
 
-            List<SonarProject> projects = sonarClient.getProjects(instanceUrl);
-            int projSize = ((projects != null) ? projects.size() : 0);
-            log("Fetched projects   " + projSize , start);
+			List<SonarProject> projects = sonarClient.getProjects(instanceUrl);
+			int projSize = ((projects != null) ? projects.size() : 0);
+			log("Fetched projects   " + projSize , start);
 
-            addNewProjects(projects, collector);
+			addNewProjects(projects, collector);
 
-            refreshData(enabledProjects(collector, instanceUrl));
+			refreshData(enabledProjects(collector, instanceUrl));
 
-            log("Finished", start);
-        }
-    }
+			log("Finished", start);
+		}
+	}
 
 
 	/**
@@ -94,18 +94,18 @@ public class SonarCollectorTask extends CollectorTask<SonarCollector> {
 	 *            the {@link HudsonCollector}
 	 */
 
-    private void clean(SonarCollector collector) {
+	private void clean(SonarCollector collector) {
 		Set<ObjectId> uniqueIDs = new HashSet<>();
 		for (com.capitalone.dashboard.model.Component comp : dbComponentRepository
 				.findAll()) {
-			if (comp.getCollectorItems() != null && !comp.getCollectorItems().isEmpty()) {
+			if (comp.getCollectorItems() != null && !comp.getCollectorItems().isEmpty() && comp.getCollectorItems().get(
+					CollectorType.CodeQuality) != null) {
 				List<CollectorItem> itemList = comp.getCollectorItems().get(
 						CollectorType.CodeQuality);
-				if (itemList != null) {
-					for (CollectorItem ci : itemList) {
-						if (ci != null && ci.getCollectorId().equals(collector.getId())){
-							uniqueIDs.add(ci.getId());
-						}
+				for (CollectorItem ci : itemList) {
+					if (ci != null && ci.getCollectorId().equals(collector.getId())){
+						uniqueIDs.add(ci.getId());
+
 					}
 				}
 			}
@@ -122,50 +122,50 @@ public class SonarCollectorTask extends CollectorTask<SonarCollector> {
 		sonarProjectRepository.save(jobList);
 	}
 
-    private void refreshData(List<SonarProject> sonarProjects) {
-        long start = System.currentTimeMillis();
-        int count = 0;
+	private void refreshData(List<SonarProject> sonarProjects) {
+		long start = System.currentTimeMillis();
+		int count = 0;
 
-        for (SonarProject project : sonarProjects) {
-            CodeQuality codeQuality = sonarClient.currentCodeQuality(project);
-            if (codeQuality != null && isNewQualityData(project, codeQuality)) {
-                codeQuality.setCollectorItemId(project.getId());
-                codeQualityRepository.save(codeQuality);
-                count++;
-            }
-        }
+		for (SonarProject project : sonarProjects) {
+			CodeQuality codeQuality = sonarClient.currentCodeQuality(project);
+			if (codeQuality != null && isNewQualityData(project, codeQuality)) {
+				codeQuality.setCollectorItemId(project.getId());
+				codeQualityRepository.save(codeQuality);
+				count++;
+			}
+		}
 
-        log("Updated", start, count);
-    }
+		log("Updated", start, count);
+	}
 
-    private List<SonarProject> enabledProjects(SonarCollector collector, String instanceUrl) {
-        return sonarProjectRepository.findEnabledProjects(collector.getId(), instanceUrl);
-    }
+	private List<SonarProject> enabledProjects(SonarCollector collector, String instanceUrl) {
+		return sonarProjectRepository.findEnabledProjects(collector.getId(), instanceUrl);
+	}
 
-    private void addNewProjects(List<SonarProject> projects, SonarCollector collector) {
-        long start = System.currentTimeMillis();
-        int count = 0;
+	private void addNewProjects(List<SonarProject> projects, SonarCollector collector) {
+		long start = System.currentTimeMillis();
+		int count = 0;
 
-        for (SonarProject project : projects) {
+		for (SonarProject project : projects) {
 
-            if (isNewProject(collector, project)) {
-                project.setCollectorId(collector.getId());
-                project.setEnabled(false);
-                project.setDescription(project.getProjectName());
-                sonarProjectRepository.save(project);
-                count++;
-            }
-        }
-        log("New projects", start, count);
-    }
+			if (isNewProject(collector, project)) {
+				project.setCollectorId(collector.getId());
+				project.setEnabled(false);
+				project.setDescription(project.getProjectName());
+				sonarProjectRepository.save(project);
+				count++;
+			}
+		}
+		log("New projects", start, count);
+	}
 
-    private boolean isNewProject(SonarCollector collector, SonarProject application) {
-        return sonarProjectRepository.findSonarProject(
-                collector.getId(), application.getInstanceUrl(), application.getProjectId()) == null;
-    }
+	private boolean isNewProject(SonarCollector collector, SonarProject application) {
+		return sonarProjectRepository.findSonarProject(
+				collector.getId(), application.getInstanceUrl(), application.getProjectId()) == null;
+	}
 
-    private boolean isNewQualityData(SonarProject project, CodeQuality codeQuality) {
-        return codeQualityRepository.findByCollectorItemIdAndTimestamp(
-                project.getId(), codeQuality.getTimestamp()) == null;
-    }
+	private boolean isNewQualityData(SonarProject project, CodeQuality codeQuality) {
+		return codeQualityRepository.findByCollectorItemIdAndTimestamp(
+				project.getId(), codeQuality.getTimestamp()) == null;
+	}
 }

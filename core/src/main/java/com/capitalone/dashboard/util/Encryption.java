@@ -46,7 +46,7 @@ public final class Encryption {
 
         } catch (IllegalBlockSizeException | BadPaddingException
                 | InvalidKeyException | NoSuchAlgorithmException
-                | NoSuchPaddingException | NullPointerException e) {
+                | NoSuchPaddingException e) {
             throw new EncryptionException("Cannot encrypt this message" + '\n'
                     + e.getMessage());
         }
@@ -65,7 +65,7 @@ public final class Encryption {
 
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
                 | InvalidKeyException | IllegalBlockSizeException
-                | BadPaddingException | NullPointerException
+                | BadPaddingException
                 | IllegalArgumentException e) {
             throw new EncryptionException("Cannot decrypt this message" + '\n'
                     + e.getMessage());
@@ -86,7 +86,7 @@ public final class Encryption {
             encryptedMessage = Base64.encodeBase64String(encryptedBytes);
         } catch (IllegalBlockSizeException | BadPaddingException
                 | InvalidKeyException | NoSuchAlgorithmException
-                | NoSuchPaddingException | NullPointerException e) {
+                | NoSuchPaddingException e) {
             throw new EncryptionException("Cannot encrypt this message" + '\n'
                     + e.getMessage());
         }
@@ -108,7 +108,7 @@ public final class Encryption {
 
         } catch (NoSuchAlgorithmException | NoSuchPaddingException
                 | InvalidKeyException | IllegalBlockSizeException
-                | BadPaddingException | NullPointerException
+                | BadPaddingException 
                 | IllegalArgumentException e) {
             throw new EncryptionException("Cannot decrypt this message" + '\n'
                     + e.getMessage());
@@ -116,7 +116,7 @@ public final class Encryption {
         return decryptedMessage;
     }
 
-
+/*
     public static void main(String[] args) {
         try {
             String k = Encryption.getStringKey();
@@ -128,4 +128,5 @@ public final class Encryption {
             e.printStackTrace();
         }
     }
+    */
 }
