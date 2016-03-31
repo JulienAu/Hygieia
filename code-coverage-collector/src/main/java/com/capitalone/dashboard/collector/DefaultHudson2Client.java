@@ -116,6 +116,10 @@ public class DefaultHudson2Client implements Hudson2Client {
 		String url2 = joinURL(urlWB, JOBS_URL_DETAILS_UNITAIRE);
 		List<String> codeCoverage = codeCoverage(url);
 		List<String> codeCoverageUnitaire = codeCoverage(url2);
+		List<String> valgrind = valgrindReport(buildUrl);
+		List<String> dryResult = dryResultAll(joinURL(buildUrl , "/dryResult/"));
+		List<String> loc = lOC(buildUrl);
+		List<String> cobertura = coberturaCoverageReport(urlWB);
 		Build2 build = new Build2();
 		if(!codeCoverage.isEmpty()){
 			build.setLineCoverage(codeCoverage.get(0));
@@ -127,6 +131,30 @@ public class DefaultHudson2Client implements Hudson2Client {
 			build.setFunctionCoverageUnitaire(codeCoverageUnitaire.get(1));
 			build.setBranchCoverageUnitaire(codeCoverageUnitaire.get(2));
 		}
+		if(!valgrind.isEmpty()){
+			build.setBytesLostValgrind(valgrind.get(0));
+		}
+		if(!dryResult.isEmpty()){
+			build.setDuplicateCodeWarnings(dryResult.get(0));
+			build.setDuplicateCodeHigh(dryResult.get(1));
+			build.setDuplicateCodeMedium(dryResult.get(2));
+			build.setDuplicateCodeLow(dryResult.get(3));
+		}
+		if(!cobertura.isEmpty()){
+			build.setPackageCoverageCobertura(cobertura.get(0));
+			build.setFileCoverageCobertura(cobertura.get(1));
+			build.setClassesCoverageCobertura(cobertura.get(2));
+			build.setLineCoverageCobertura(cobertura.get(3));
+			build.setConditionalsCoverageCobertura(cobertura.get(4));
+
+		}
+		if(!dryResult.isEmpty()){
+			build.setDuplicateCodeWarnings(dryResult.get(0));
+			build.setDuplicateCodeHigh(dryResult.get(1));
+			build.setDuplicateCodeMedium(dryResult.get(2));
+			build.setDuplicateCodeLow(dryResult.get(3));
+		}
+		locBuild(loc , build);
 		build.setNumber(urlWithoutBuild[urlWithoutBuild.length-1]);
 		build.setBuildUrl(buildUrl);
 		build.setTimestamp(System.currentTimeMillis());
@@ -134,6 +162,19 @@ public class DefaultHudson2Client implements Hudson2Client {
 
 	}
 
+	
+	private void locBuild(List<String> loc , Build2 build){
+		if(!loc.isEmpty()){
+			build.getLoc().add(loc.get(0));
+			build.getLocFile().add(loc.get(1));
+			build.getLocLanguage().add(loc.get(2));
+			for (int i = 3 ; i < loc.size() ; i= i + 3){
+				build.getLocLanguage().add(loc.get(i));
+				build.getLoc().add(loc.get(i+1));
+				build.getLocFile().add(loc.get(i+2));
+			}
+		}
+	}
 
 
 
@@ -223,7 +264,6 @@ public class DefaultHudson2Client implements Hudson2Client {
 
 	private List<String> codeCoverage(String url) throws IOException{
 		ArrayList<String> res = new ArrayList<String>();
-		//Document doc = Jsoup.parse(input , "UTF-8");
 		try{
 			Document doc = Jsoup.connect(url).get();
 			Element elementsByTag = doc.getElementsByTag("body").get(0);
@@ -239,4 +279,115 @@ public class DefaultHudson2Client implements Hudson2Client {
 		}
 		return res;
 	}
+
+	private static List<String> coberturaCoverageReport(String url) throws IOException{
+		List<String> res = new ArrayList<String>();	
+		try{
+			Document doc = Jsoup.connect(url).get();	
+			Elements elementsByTag = doc.getElementsByTag("body");
+			for(Element row1 : elementsByTag) {
+				Element row = row1.getElementsByTag("table").get(3);
+				String test = row.text();
+				String[] resSplit = test.split(" ");
+				for(String res2 : resSplit){
+					if (res2.matches("[0-9]*+%")){
+						res.add(res2);
+					}
+				}
+			}
+		} catch (IOException e) {
+			LOG.info("No Cobertura KPI");
+		}
+		return res;
+	}
+
+	private static List<String> valgrindReport(String url) throws IOException{
+		List<String> res = new ArrayList<String>();	
+		try{
+			Document doc = Jsoup.connect(url).get();	
+			Elements elementsByTag = doc.getElementsByTag("body");
+			for(Element row1 : elementsByTag) {
+
+				Element row = row1.getElementsByTag("table").get(1);
+
+				String test = row.text();
+				String[] resSplit = test.split(" ");
+				for(String res2 : resSplit){
+					if (res2.matches("[0-9]+")){
+						res.add(res2);
+					}
+				}
+
+			}		
+		} catch (IOException e) {
+			LOG.info("No Valgrind KPI");
+		}
+		return res;
+	}
+
+
+	private static List<String> dryResultAll(String url) throws IOException{
+		List<String> res = new ArrayList<String>();	
+		try{
+			Document doc = Jsoup.connect(url).get();	
+			Elements elementsByTag = doc.getElementsByTag("body");
+			for(Element row1 : elementsByTag) {
+				Element row = row1.getElementsByTag("table").get(1);
+				String test = row.text();
+				String[] resSplit = test.split(" ");
+				for(String res2 : resSplit){
+					if (res2.matches("[0-9]+")){
+						res.add(res2);
+					}
+				}
+			}
+		} catch (IOException e) {
+			LOG.info("No Dupliicate Code KPI");
+		}
+		return res;
+	}
+
+
+
+
+	private static List<String> lOC(String url) throws IOException{
+		List<String> res = new ArrayList<String>();	
+		try{
+			Document doc = Jsoup.connect(url).get();	
+			Elements elementsByTag = doc.getElementsByTag("body");
+			for(Element row1 : elementsByTag) {
+				Elements row = row1.getElementsByTag("table").get(0).getElementsByTag("td");
+				for(Element row2 : row) {
+					String test = row2.text();
+					if (test.matches("[0-9]++.+")){
+						String[] resSplit = test.split("\\.");
+						for(String res2 : resSplit){
+
+							String[] resSplit2 = res2.split(" ");
+							String language="";
+							for(String res3 : resSplit2){
+
+								if (res3.matches("[1-9]++.*")){
+									res3=res3.replaceAll("[^0-9]","");
+									res.add(res3);
+								}
+								if(res3.matches("\\:")){
+									res.add(language);
+								}
+								language = res3;
+							}
+						}
+
+					}
+				}
+			}		
+		} catch (IOException e) {
+			LOG.info("No LOC KPI");
+		}
+		return res;
+	}
+
+
 }
+
+
