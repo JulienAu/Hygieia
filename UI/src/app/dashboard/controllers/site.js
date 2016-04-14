@@ -26,6 +26,8 @@
         ctrl.deleteDashboard = deleteDashboard;
         ctrl.open = open;
         ctrl.openJava = openJava;
+        ctrl.openCpp = openCpp;
+        ctrl.openAll = openAll;
         ctrl.logout= logout;
         ctrl.admin = admin;
         ctrl.templateUrl = "app/dashboard/views/navheader.html";
@@ -77,6 +79,14 @@ $cookieStore.remove("username");
 
         function openJava() {
             $location.path('/siteJava');
+        }
+
+        function openCpp() {
+            $location.path('/siteCpp');
+        }
+
+        function openAll() {
+            $location.path('/site');
         }
 
         function processResponse(data) {

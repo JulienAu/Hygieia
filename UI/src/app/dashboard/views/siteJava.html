@@ -1,4 +1,4 @@
-<div id="site">
+<div id="siteJava">
     <ng-include src="ctrl.templateUrl"></ng-include>
 
     <div class="col-md-8 col-md-push-2">
@@ -22,18 +22,17 @@
                             Create a new dashboard
                         </div>
                     </div>
-                   
                 </div>
             </div>
-        </div>  
-        <div class="row">
+        </div>
+                <div class="row">
                          <div class="col-xs-1">
-                        <div class="btn btn-default" ng-click="ctrl.openJava()">
+                        <div class="btn btn-default" ng-click="ctrl.openAll()">
                             <span class="fa fa-stack fa-lg">
                                 <span class="fa-circle-thin fa-stack-2x"></span>
                             </span>
                             <br/>
-                            Java Project
+                            All Project
                         </div>
                     </div>
                     <div class="col-xs-1">
@@ -47,8 +46,8 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-xs-4" onload="getProject('api/dashboard/mydashboard/')">
-                        <table id="table1" class="sortable" class="hidden">
+                    <div class="col-xs-4" onload="getProjectJava('api/dashboard/mydashboard/')">
+<table id="table1" class="sortable" class="hidden">
                                     <tr>
                                     <th> Projects</th>
                                     <th> Lines of code </th>
@@ -56,53 +55,19 @@
                                     <th> Issues(&lt= Major)</th>
                                     <th> Lines Covered (%) </th>
                                     <th> Nb tests </th>
-                                    <th> Last Build</th>
-                                    <th> Nb tests functional  <br />
-                                        <ul>
-                                        <LI>Fail  <br />
-                                        <LI>Skip <br />
-                                        <LI>Pass  <br />
-                                         </ul></th>
-                                    <th> Coverage functional<br />
-                                        <ul>
-                                        <LI>Line <br />
-                                        <LI>Function <br />
-                                        <LI>Branch<br />
-                                        </ul>
-                                    </th>
-                                    <th> Coverage UT<br />
-                                        <ul>
-                                        <LI>Line <br />
-                                        <LI>Function <br />
-                                        <LI>Branch<br />
-                                        </ul>
-                                    </th>
-                                    <th> bytes Lost (valgrind)</th>
-                                    <th> Duplicate Code<br />
-                                        <ul>
-                                        <LI>Warnings <br />
-                                        <LI>High <br />
-                                        <LI>Medium<br />
-                                        <LI>Low<br />
-                                        </ul>
-                                    </th>
-                                    <th> number Warning Cpp</th> 
-                                    <th> number Error Cpp</th>
                                     <th> Status</th>                                  
                                 </tr>
+                                <tbody>
+                                </tbody>
                             </table>
                         </ul>
                     </div>
+
                 </div>
 
 
-    <div class="col-xs-1">
-        <div>
-                        <button onclick="getProject('api/dashboard/mydashboard/');" >Get data for all projects</button>
+    <button onclick="getProjectJava('api/dashboard/mydashboard/');">Get Data</button>
 
-                 </div>
-            </div>
     </div>
 </div>
-
 

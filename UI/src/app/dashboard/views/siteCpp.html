@@ -1,4 +1,4 @@
-<div id="site">
+<div id="siteCpp">
     <ng-include src="ctrl.templateUrl"></ng-include>
 
     <div class="col-md-8 col-md-push-2">
@@ -22,11 +22,10 @@
                             Create a new dashboard
                         </div>
                     </div>
-                   
                 </div>
             </div>
-        </div>  
-        <div class="row">
+        </div>
+                <div class="row">
                          <div class="col-xs-1">
                         <div class="btn btn-default" ng-click="ctrl.openJava()">
                             <span class="fa fa-stack fa-lg">
@@ -37,25 +36,21 @@
                         </div>
                     </div>
                     <div class="col-xs-1">
-                        <div class="btn btn-default" ng-click="ctrl.openCpp()">
+                        <div class="btn btn-default" ng-click="ctrl.openAll()">
                             <span class="fa fa-stack fa-lg">
                                 <span class="fa-circle-thin fa-stack-2x"></span>
                             </span>
                             <br/>
-                            Cpp Project
+                            All Project
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-xs-4" onload="getProject('api/dashboard/mydashboard/')">
+                    <div class="col-xs-4" onload="getProjectCpp('api/dashboard/mydashboard/')">
                         <table id="table1" class="sortable" class="hidden">
                                     <tr>
                                     <th> Projects</th>
                                     <th> Lines of code </th>
-                                    <th> Issues(>= Critical) </th>
-                                    <th> Issues(&lt= Major)</th>
-                                    <th> Lines Covered (%) </th>
-                                    <th> Nb tests </th>
                                     <th> Last Build</th>
                                     <th> Nb tests functional  <br />
                                         <ul>
@@ -96,12 +91,7 @@
                 </div>
 
 
-    <div class="col-xs-1">
-        <div>
-                        <button onclick="getProject('api/dashboard/mydashboard/');" >Get data for all projects</button>
-
-                 </div>
-            </div>
+    <button onclick="getProjectCpp('api/dashboard/mydashboard/');">Get Data</button>
     </div>
 </div>
 
