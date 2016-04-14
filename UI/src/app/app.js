@@ -71,6 +71,16 @@ var localStorageSupported = (function () {
                     controller: 'SiteController',
                     controllerAs: 'ctrl'
                 })
+                 .when('/siteJava', {
+                    templateUrl: 'app/dashboard/views/siteJava.html',
+                    controller: 'SiteController',
+                    controllerAs: 'ctrl'
+                })
+                  .when('/siteCpp', {
+                    templateUrl: 'app/dashboard/views/siteCpp.html',
+                    controller: 'SiteController',
+                    controllerAs: 'ctrl'
+                })                
                 //login
 
                 .when('/',{

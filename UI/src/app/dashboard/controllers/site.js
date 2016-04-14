@@ -25,6 +25,7 @@
         ctrl.createDashboard = createDashboard;
         ctrl.deleteDashboard = deleteDashboard;
         ctrl.open = open;
+        ctrl.openJava = openJava;
         ctrl.logout= logout;
         ctrl.admin = admin;
         ctrl.templateUrl = "app/dashboard/views/navheader.html";
@@ -74,6 +75,10 @@ $cookieStore.remove("username");
             $location.path('/dashboard/' + dashboardId);
         }
 
+        function openJava() {
+            $location.path('/siteJava');
+        }
+
         function processResponse(data) {
             // add dashboards to list
             ctrl.dashboards = [];
@@ -99,22 +104,6 @@ $cookieStore.remove("username");
             }
 
         }
-/*        
-        function processDashValues(mydata) {
-            // add values to list
-            ctrl.myvalues = [];
-            for (var x = 0; x < mydata.length; x++) {
-
-                ctrl.myvalues.push({
-                    value: mydata[x].result[0].metrics[0].formattedValue
-                    
-                    
-                });
-
-            }
-
-        }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////*/
         
 
         function deleteDashboard(id) {

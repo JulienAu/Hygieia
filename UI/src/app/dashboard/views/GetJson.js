@@ -1,22 +1,40 @@
-function getjsonConf(url ,array , callback){
+function Conf(x , y)
+{
+  if(parseInt(y) < 0){
+    if(parseInt(x) < Math.abs(parseInt(y))){
+        return "<div id=\"moncercle\"></div>";
+    } 
+    return "";
+  } else {
+ if(parseInt(x) > parseInt(y)){
+  return "<div id=\"moncercle\"></div>";
+  }
+  return "";
+  }
+}
+
+
+function getjsonConf(url , callback){
+  var array= new Array(101);
+  for(i =0 ; i < 100 ; i++){
+    array[i]=999999;
+  }
   $(document).ready(function() {
                 $.getJSON(url, function(jd) {
-                  var k= 0;
+                  var k= 1;
                 $.each(jd, function(i, field){
                   if ( i == "Conf") {
                     if(jd.Conf.length > 0){
                         $.each(jd.Conf[0], function(i, field){
-                            switch(i) {
-                            case "Valgrind":
-                                  array[40]=field;
-                              break;
-                            case "Functional":
-                                 array[41]=field;
-                            break;
-                            default:
-                              k = 100 + i;
-                        } 
-
+                          if(k == 4 ){
+                            array[k] = 999999;
+                            array[k+1] = 999999;
+                            array[k+2] = field;
+                            k = k + 2;
+                          } else {
+                            array[k] = field;
+                          }
+                          k++;
                           });
                       }
                       callback(array);
@@ -34,7 +52,7 @@ function getjsonCodeCoverage(url ,array , callback){
                 $.each(jd, function(i, field){
                   if ( i == "result") {
                     if(jd.result.length > 0){
-                        $.each(jd.result[0], function(i, field){
+                        $.each(jd.result[jd.result.length-1], function(i, field){
                             switch(i) {
                             case "lineCoverage":
                                   array[9]=field;
@@ -57,22 +75,6 @@ function getjsonCodeCoverage(url ,array , callback){
                             case "bytesLostValgrind":
                                   array[15]=field;
                             break;
-                            /*
-                            case "packageCoverageCobertura":
-                                  array[17]=field;
-                            break;
-                            case "lineCoverageCobertura":
-                                  array[18]=field;
-                            break;
-                            case "fileCoverageCobertura":
-                                  array[19]=field;
-                            break;
-                            case "classesCoverageCobertura":
-                                  array[20]=field;
-                            break;   
-                             case "conditionalsCoverageCobertura":
-                                  array[21]=field;
-                            break;*/
                             case "duplicateCodeWarnings":
                                   array[16]=field;
                             break;
@@ -84,23 +86,10 @@ function getjsonCodeCoverage(url ,array , callback){
                             break;   
                              case "duplicateCodeLow":
                                   array[19]=field;
-                            break;
-                            /*
-                            case "locLanguage":
-                                  array[26]=field;
-                            break;
-                            case "loc":
-                                  array[27]=field;
-                            break;   
-                             case "locFile":
-                                  array[28]=field;
-                            break;    
-                            */                     
+                            break;                  
                             default:
-                              k = 100 + i;
+                              k = 100;
                         } 
-                             
-                              //$("#table").append(field)
                           });
                       }
                       callback(array);
@@ -118,7 +107,7 @@ function getjsonJenkins(url ,array, callback){
                 $.each(jd, function(i, field){
                   if ( i == "result"  ) {
                     if(jd.result.length > 0){
-                        $.each(jd.result[0], function(i, field){
+                        $.each(jd.result[jd.result.length-1], function(i, field){
                             switch(i) {
                             case "buildStatus":
                                   array[5]=field;
@@ -134,28 +123,19 @@ function getjsonJenkins(url ,array, callback){
                               }
                             break;
                             case "passCount":
-                                //if(field != "none"){
+                              if(field != "none"){
                                   array[8]=field;
-                               // }
+                                }
                             break;
-                            /*
-                             case "totalCount":
-                                 array[9]=field;
-                            break;
-                            */
                             case "numberWarningSeverityCpp":
-                                //if(field != "none"){
                                   array[20]=field;
-                               // }
                             break;
                              case "numberErrorSeverityCpp":
                                  array[21]=field;
                             break;                           
                               default:
-                              k = 100 + i;
-                        } 
-                             
-                              //$("#table").append(field)
+                              k = 100;
+                            } 
                           });
                         }
                         callback(array);
@@ -199,8 +179,8 @@ function getProject(url) {
 
 function getjsonComparaison(id , idDashboard , title) {
   url = 'api/quality/static-analysis?componentId='+id+'&max=5';
-  var array= new Array(10000);
-  var array2 = new Array(10000);
+  var array= new Array(101);
+  var array2 = new Array(101);
   for (i = 0; i < 100; i++) {
     array[i] = " - ";
   }
@@ -237,7 +217,7 @@ function getjsonComparaison(id , idDashboard , title) {
                                   k = 31;
                             break;
                               default:
-                              k = 100 + i; //
+                              k = 100; //
                         } 
                         $.each(jd.result[j].metrics[i], function(i, field){
                           if(i == "value"){
@@ -261,60 +241,61 @@ function getjsonComparaison(id , idDashboard , title) {
                 });
                     getjsonJenkins('api/build/?componentId='+id+'&max=1' ,array,function(array) {
                       getjsonCodeCoverage('api/build2/?componentId='+id+'&max=1' ,array,function(array) {
-                        getjsonConf('Conf.json' ,array,function(array) {
-                     array[1] += array[31];
-                     array[2] += array[32];
-                     for (i = 20; i < 24; i++) {
-                        if(!(array2[i]=== undefined)){
-                            array2[i-9] += array2[i];
+                        getjsonConf('Conf.json' ,function(array3) {
+                         array[1] += array[31];
+                         array[2] += array[32];
+                         for (i = 31; i < 33; i++) {
+                            if(!(array2[i]=== undefined)){
+                                array2[i-30] += array2[i];
+                            }
+                          }
+                          k=-1;
+                          var status = 0;
+                          for (i = 0; i < 22; i++) {
+                            k++;
+                            var color = Conf(array[i] , array3[k]);
+                            if(color.length > 0){
+                              status=1;
+                            }
+                            txt += "<td>"+ color;
+                            if(array2[i]=== undefined){
+                             if(i == 6){
+                                  txt += "F : "+array[i]+"<br /> S : "+array[i+1]+"<br /> P : "+array[i+2]+" </td>";
+                                  i = i+2;
+                              }
+                              else if(i == 9 || i == 12){
+                                txt += "L : "+array[i]+"<br /> F : "+array[i+1]+"<br /> B : "+array[i+2]+" </td>";
+                                i = i+2;
+                              }
+                              else if(i == 16){
+                                txt += "W : "+array[i]+"<br /> H : "+array[i+1]+"</font><br /> M : "+array[i+2]+"<br /> L : "+array[i+3]+" </td>";
+                                i = i+3;
+                              }
+                              else{
+                              txt += array[i]+"</td>";
+                            }
+                           } else {
+                              if ((array[i] - array2[i]) > 0){
+                                txt += array[i]+" <br /> (↑+"+ Math.round((array[i] - array2[i])*100)/100+ ")</td>";
+                              }else{
+                              txt += array[i]+" <br /> (↓"+ Math.round((array[i] - array2[i])*100)/100+ ")</td>";
+                            }
                           }
                         }
-                      for (i = 0; i < 22; i++) {
-                        if(array2[i]=== undefined){
-                         if(i == 6){
-                          if(array[i] > array[41]){// Condition a modifier avec un fichier de conf
-                              txt += "<td bgcolor=\"#FF0000\">F : "+array[i]+"</font><br /> S : "+array[i+1]+"<br /> P : "+array[i+2]+" </td>";
-                            }else{
-                               txt += "<td>F : "+array[i]+"</font><br /> S : "+array[i+1]+"<br /> P : "+array[i+2]+" </td>";
-                             }
-                              i = i+2;
-                          }
-                          else if(i == 15){
-                          if(array[i] > array[41]){ // Condition a modifier avec un fichier de conf
-                              txt += "<td bgcolor=\"#FF0000\">"+array[i]+"</td>";
-                            }else{
-                               txt += "<td>"+array[i]+"</td>";
-                             }
-                          }
-                          else if(i == 9 || i == 12){
-                            txt += "<td>L : "+array[i]+"<br /> F : "+array[i+1]+"<br /> B : "+array[i+2]+" </td>";
-                            i = i+2;
-                          }
-                          else if(i == 16){
-                            txt += "<td>W : "+array[i]+"<br /> H : "+array[i+1]+"</font><br /> M : "+array[i+2]+"<br /> L : "+array[i+3]+" </td>";
-                            i = i+3;
-                          }
-                          else{
-                          txt += "<td>"+array[i]+"</td>";
+                        if(status == 1){
+                          txt += "<td><img src=\"status/nuage.png\"></td>";
+                        }else{
+                          txt += "<td><img src=\"status/soleil.png\"></td>";
                         }
-                       } else {
-                          if ((array[i] - array2[i]) > 0){
-                            txt += "<td>"+array[i]+" <br /> (↑+"+ Math.round((array[i] - array2[i])*100)/100+ ")</td>";
-                          }else{
-                          txt += "<td>"+array[i]+" <br /> (↓"+ Math.round((array[i] - array2[i])*100)/100+ ")</td>";
-                        }
-                      }
-                      }
-
                        if(txt != ""){
                         txt +="<td><a href ng-click=\"ctrl.deleteDashboard("+idDashboard+")\"><span class=\"fa fa-trash-o fa-lg text-danger\"></span></a></td></tr>";
                         $("#table1").append(txt).removeClass("hidden");
-                    }
-                  });
-                     });
-                   });
+                        }
+                    });
+                });
               });
+            });
           });
 
-
 }
+
