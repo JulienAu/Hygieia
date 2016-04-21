@@ -42,7 +42,7 @@ public class HudsonCollectorTaskTests {
 
     @InjectMocks private Hudson2CollectorTask task;
 
-    private static final String SERVER1 = "server1";
+    private static final String SERVER1 = "http://jenkins.net";
 
     @Test
     public void collect_noBuildServers_nothingAdded() throws MalformedURLException, IOException {
@@ -116,8 +116,9 @@ public class HudsonCollectorTaskTests {
     @Ignore @Test
     public void collect_jobEnabled_newBuild_buildAdded() throws MalformedURLException, IOException {
         Hudson2Collector collector = collectorWithOneServer();
-        Hudson2Job job = hudsonJob("JOB1", SERVER1, "JOB1_URL");
-        Build2 build = build("JOB1_1", "JOB1_1_URL");
+        Hudson2Job job = hudsonJob("Test", SERVER1, "http://jenkins.net/job/Test");
+        job.setId(ObjectId.get());
+        Build2 build = build("383", "http://jenkins.net/job/Test");
 
         when(hudsonClient.getInstanceJobs(SERVER1)).thenReturn(oneJobWithBuilds(job, build));
         when(hudsonJobRepository.findEnabledHudsonJobs(collector.getId(), SERVER1))

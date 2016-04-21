@@ -51,6 +51,8 @@ public class DefaultHudson2Client implements Hudson2Client {
 	private static final String JOBS_URL_SUFFIX = "/api/json?tree=jobs[name,url,builds[number,url]]";
 	private static final String JOBS_URL_DETAILS = "/Functional_Coverage/index.html";
 	private static final String JOBS_URL_DETAILS_UNITAIRE = "/UT_Coverage/index.html";
+	private static final String BUILD_DETAILS_URL_SUFFIX = "/api/json?tree=building";
+
 
 
 	@Autowired
@@ -83,7 +85,7 @@ public class DefaultHudson2Client implements Hudson2Client {
 
 						// A basic Build object. This will be fleshed out later if this is a new Build.
 						String buildNumber = jsonBuild.get("number").toString();
-						if (!buildNumber.equals("0")) {
+						if (!buildNumber.equals("0") ) {
 							Build2 hudsonBuild = new Build2();
 							hudsonBuild.setNumber(buildNumber);
 							hudsonBuild.setBuildUrl(getString(jsonBuild, "url"));
@@ -114,55 +116,51 @@ public class DefaultHudson2Client implements Hudson2Client {
 		}
 		String url = joinURL(urlWB, JOBS_URL_DETAILS);
 		String url2 = joinURL(urlWB, JOBS_URL_DETAILS_UNITAIRE);
-		List<String> codeCoverage = codeCoverage(url);
-		List<String> codeCoverageUnitaire = codeCoverage(url2);
-		List<String> valgrind = valgrindReport(buildUrl);
-		List<String> dryResult = dryResultAll(joinURL(buildUrl , "/dryResult/"));
-		List<String> loc = lOC(buildUrl);
-		List<String> cobertura = coberturaCoverageReport(urlWB);
-		Build2 build = new Build2();
-		if(!codeCoverage.isEmpty()){
-			build.setLineCoverage(codeCoverage.get(0));
-			build.setFunctionCoverage(codeCoverage.get(1));
-			build.setBranchCoverage(codeCoverage.get(2));
-		}
-		if(!codeCoverageUnitaire.isEmpty()){
-			build.setLineCoverageUnitaire(codeCoverageUnitaire.get(0));
-			build.setFunctionCoverageUnitaire(codeCoverageUnitaire.get(1));
-			build.setBranchCoverageUnitaire(codeCoverageUnitaire.get(2));
-		}
-		if(!valgrind.isEmpty()){
-			build.setBytesLostValgrind(valgrind.get(0));
-		}
-		if(!dryResult.isEmpty()){
-			build.setDuplicateCodeWarnings(dryResult.get(0));
-			build.setDuplicateCodeHigh(dryResult.get(1));
-			build.setDuplicateCodeMedium(dryResult.get(2));
-			build.setDuplicateCodeLow(dryResult.get(3));
-		}
-		if(!cobertura.isEmpty()){
-			build.setPackageCoverageCobertura(cobertura.get(0));
-			build.setFileCoverageCobertura(cobertura.get(1));
-			build.setClassesCoverageCobertura(cobertura.get(2));
-			build.setLineCoverageCobertura(cobertura.get(3));
-			build.setConditionalsCoverageCobertura(cobertura.get(4));
+		if(!building(buildUrl)){
+			List<String> cobertura = coberturaCoverageReport(buildUrl);
+			List<String> codeCoverage = codeCoverage(url);
+			List<String> codeCoverageUnitaire = codeCoverage(url2);
+			List<String> valgrind = valgrindReport(buildUrl);
+			List<String> dryResult = dryResultAll(joinURL(buildUrl , "/dryResult/"));
+			List<String> loc = lOC(buildUrl);
+			Build2 build = new Build2();
+			if(!codeCoverage.isEmpty()){
+				build.setLineCoverage(codeCoverage.get(0));
+				build.setFunctionCoverage(codeCoverage.get(1));
+				build.setBranchCoverage(codeCoverage.get(2));
+			}
+			if(!codeCoverageUnitaire.isEmpty()){
+				build.setLineCoverageUnitaire(codeCoverageUnitaire.get(0));
+				build.setFunctionCoverageUnitaire(codeCoverageUnitaire.get(1));
+				build.setBranchCoverageUnitaire(codeCoverageUnitaire.get(2));
+			}
+			if(!valgrind.isEmpty()){
+				build.setBytesLostValgrind(valgrind.get(0));
+			}
+			if(!dryResult.isEmpty()){
+				build.setDuplicateCodeWarnings(dryResult.get(0));
+				build.setDuplicateCodeHigh(dryResult.get(1));
+				build.setDuplicateCodeMedium(dryResult.get(2));
+				build.setDuplicateCodeLow(dryResult.get(3));
+			}
+			if(!cobertura.isEmpty()){
+				build.setPackageCoverageCobertura(cobertura.get(0));
+				build.setFileCoverageCobertura(cobertura.get(1));
+				build.setClassesCoverageCobertura(cobertura.get(2));
+				build.setLineCoverageCobertura(cobertura.get(3));
+				build.setConditionalsCoverageCobertura(cobertura.get(4));
 
+			}
+			locBuild(loc , build);
+			build.setNumber(urlWithoutBuild[urlWithoutBuild.length-1]);
+			build.setBuildUrl(buildUrl);
+			build.setTimestamp(System.currentTimeMillis());
+			return build;
 		}
-		if(!dryResult.isEmpty()){
-			build.setDuplicateCodeWarnings(dryResult.get(0));
-			build.setDuplicateCodeHigh(dryResult.get(1));
-			build.setDuplicateCodeMedium(dryResult.get(2));
-			build.setDuplicateCodeLow(dryResult.get(3));
-		}
-		locBuild(loc , build);
-		build.setNumber(urlWithoutBuild[urlWithoutBuild.length-1]);
-		build.setBuildUrl(buildUrl);
-		build.setTimestamp(System.currentTimeMillis());
-		return build;
-
+		return null;
 	}
 
-	
+
 	private void locBuild(List<String> loc , Build2 build){
 		if(!loc.isEmpty()){
 			build.getLoc().add(loc.get(0));
@@ -286,7 +284,7 @@ public class DefaultHudson2Client implements Hudson2Client {
 			Document doc = Jsoup.connect(url).get();	
 			Elements elementsByTag = doc.getElementsByTag("body");
 			for(Element row1 : elementsByTag) {
-				Element row = row1.getElementsByTag("table").get(3);
+				Element row = row1.getElementsByTag("table").get(0);
 				String test = row.text();
 				String[] resSplit = test.split(" ");
 				for(String res2 : resSplit){
@@ -342,12 +340,31 @@ public class DefaultHudson2Client implements Hudson2Client {
 				}
 			}
 		} catch (IOException e) {
-			LOG.info("No Dupliicate Code KPI");
+			LOG.info("No Duplicate Code KPI");
 		}
 		return res;
 	}
 
 
+	private boolean building(String buildUrl) {
+		String url;
+		try {
+			url = joinURL(buildUrl, BUILD_DETAILS_URL_SUFFIX);
+			ResponseEntity<String> result = makeRestCall(url);
+
+			String returnJSON = result.getBody();
+			JSONParser parser = new JSONParser();
+			JSONObject buildJson = (JSONObject) parser.parse(returnJSON);
+
+			return (Boolean) buildJson.get("building");
+			
+		} catch (MalformedURLException e) {
+			LOG.info("Error json building build2");
+		} catch (ParseException e) {
+			LOG.info("Error parse json building build2");
+		}
+		return true;
+	}
 
 
 	private static List<String> lOC(String url) throws IOException{

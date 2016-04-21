@@ -43,6 +43,7 @@ public class DefaultHudsonClientTests {
     private DefaultHudson2Client defaultHudsonClient;
 
     private static final String URL_TEST = "URL";
+    private static final String URL_TEST2 = "http://jenkins.net/job/Test/383/";
 
     @Before
     public void init() {
@@ -161,16 +162,14 @@ public class DefaultHudsonClientTests {
         assertThat(jobIt.hasNext(), is(false));
     }
 
-    @Ignore @Test
+    @Test
     public void buildDetails_full() throws Exception {
         when(rest.exchange(Matchers.any(URI.class), eq(HttpMethod.GET), Matchers.any(HttpEntity.class), eq(String.class)))
                 .thenReturn(new ResponseEntity<>(getJson("buildDetails_full.json"), HttpStatus.OK));
 
-        Build2 build = hudsonClient.getBuildDetails(URL_TEST, null);
-
-        assertThat(build.getTimestamp(), notNullValue());
-        assertThat(build.getNumber(), is("2483"));
-        assertThat(build.getBuildUrl(), is(URL_TEST));
+        Build2 build = hudsonClient.getBuildDetails(URL_TEST2, null);
+        assertThat(build.getNumber(), is("383"));
+        assertThat(build.getBuildUrl(), is(URL_TEST2));
 
     }
 

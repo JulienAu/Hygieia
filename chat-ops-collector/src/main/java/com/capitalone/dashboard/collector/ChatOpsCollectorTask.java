@@ -23,97 +23,98 @@ import java.util.Set;
 @Component
 public class ChatOpsCollectorTask extends CollectorTask<Collector> {
 
-    private final BaseCollectorRepository<Collector> collectorRepository;
-    private final ChatOpsRepository chatOpsRepository;
-    private final ChatOpsSettings chatOpsSettings;
-    private final ComponentRepository dbComponentRepository;
+	private final BaseCollectorRepository<Collector> collectorRepository;
+	private final ChatOpsRepository chatOpsRepository;
+	private final ChatOpsSettings chatOpsSettings;
+	private final ComponentRepository dbComponentRepository;
 
-    @Autowired
-    public ChatOpsCollectorTask(TaskScheduler taskScheduler,
-                                BaseCollectorRepository<Collector> collectorRepository,
-                                ChatOpsRepository chatOpsRepository,
-                                ChatOpsSettings chatOpsSettings,
-                                ComponentRepository dbComponentRepository) {
-        super(taskScheduler, "ChatOps");
-        this.collectorRepository = collectorRepository;
-        this.chatOpsRepository = chatOpsRepository;
-        this.chatOpsSettings = chatOpsSettings;
-        this.dbComponentRepository = dbComponentRepository;
-    }
+	@Autowired
+	public ChatOpsCollectorTask(TaskScheduler taskScheduler,
+			BaseCollectorRepository<Collector> collectorRepository,
+			ChatOpsRepository chatOpsRepository,
+			ChatOpsSettings chatOpsSettings,
+			ComponentRepository dbComponentRepository) {
+		super(taskScheduler, "ChatOps");
+		this.collectorRepository = collectorRepository;
+		this.chatOpsRepository = chatOpsRepository;
+		this.chatOpsSettings = chatOpsSettings;
+		this.dbComponentRepository = dbComponentRepository;
+	}
 
-    @Override
-    public Collector getCollector() {
-        Collector protoType = new Collector();
-        protoType.setName("ChatOps");
-        protoType.setCollectorType(CollectorType.ChatOps);
-        protoType.setOnline(true);
-        protoType.setEnabled(true);
-        return protoType;
-    }
+	@Override
+	public Collector getCollector() {
+		Collector protoType = new Collector();
+		protoType.setName("ChatOps");
+		protoType.setCollectorType(CollectorType.ChatOps);
+		protoType.setOnline(true);
+		protoType.setEnabled(true);
+		return protoType;
+	}
 
-    @Override
-    public BaseCollectorRepository<Collector> getCollectorRepository() {
-        return collectorRepository;
-    }
+	@Override
+	public BaseCollectorRepository<Collector> getCollectorRepository() {
+		return collectorRepository;
+	}
 
-    @Override
-    public String getCron() {
-        return chatOpsSettings.getCron();
-    }
+	@Override
+	public String getCron() {
+		return chatOpsSettings.getCron();
+	}
 
-    private void clean(Collector collector) {
-        Set<ObjectId> uniqueIDs = new HashSet<ObjectId>();
+	private void clean(Collector collector) {
+		Set<ObjectId> uniqueIDs = new HashSet<ObjectId>();
 
-        for (com.capitalone.dashboard.model.Component comp : dbComponentRepository
-                .findAll()) {
-            if ((comp.getCollectorItems() != null)
-                    && !comp.getCollectorItems().isEmpty()) {
-                List<CollectorItem> itemList = comp.getCollectorItems().get(
-                        CollectorType.SCM);
-                if (itemList != null) {
-                    for (CollectorItem ci : itemList) {
-                        if ((ci != null) && (ci.getCollectorId().equals(collector.getId()))) {
-                            uniqueIDs.add(ci.getId());
-                        }
-                    }
-                }
-            }
-        }
+		for (com.capitalone.dashboard.model.Component comp : dbComponentRepository
+				.findAll()) {
+			if ((comp.getCollectorItems() != null)
+					&& !comp.getCollectorItems().isEmpty()
+					&& comp.getCollectorItems().get(
+							CollectorType.SCM) != null) {
+				List<CollectorItem> itemList = comp.getCollectorItems().get(
+						CollectorType.SCM);
+				for (CollectorItem ci : itemList) {
+					if ((ci != null) && (ci.getCollectorId().equals(collector.getId()))) {
+						uniqueIDs.add(ci.getId());
+					}
 
-        /**
-         * Logic: Get all the collector items from the collector_item collection for this collector.
-         * If their id is in the unique set (above), keep them enabled; else, disable them.
-         */
-        List<ChatOpsRepo> repoList = new ArrayList<ChatOpsRepo>();
-        Set<ObjectId> gitID = new HashSet<ObjectId>();
-        gitID.add(collector.getId());
-        for (ChatOpsRepo repo : chatOpsRepository.findByCollectorIdIn(gitID)) {
-            if (repo != null) {
-                repo.setEnabled(uniqueIDs.contains(repo.getId()));
-                repoList.add(repo);
-            }
-        }
-        chatOpsRepository.save(repoList);
-    }
+				}
+			}
+		}
+
+		/**
+		 * Logic: Get all the collector items from the collector_item collection for this collector.
+		 * If their id is in the unique set (above), keep them enabled; else, disable them.
+		 */
+		List<ChatOpsRepo> repoList = new ArrayList<ChatOpsRepo>();
+		Set<ObjectId> gitID = new HashSet<ObjectId>();
+		gitID.add(collector.getId());
+		for (ChatOpsRepo repo : chatOpsRepository.findByCollectorIdIn(gitID)) {
+			if (repo != null) {
+				repo.setEnabled(uniqueIDs.contains(repo.getId()));
+				repoList.add(repo);
+			}
+		}
+		chatOpsRepository.save(repoList);
+	}
 
 
-    @Override
-    public void collect(Collector collector) {
+	@Override
+	public void collect(Collector collector) {
 
-        logBanner("Starting...");
-        long start = System.currentTimeMillis();
+		logBanner("Starting...");
+		long start = System.currentTimeMillis();
 
-        clean(collector);
-        for (ChatOpsRepo repo : enabledRepos(collector)) {
-            repo.setLastUpdateTime(new DateTime());
-            chatOpsRepository.save(repo);
-            log("Finished", start);
+		clean(collector);
+		for (ChatOpsRepo repo : enabledRepos(collector)) {
+			repo.setLastUpdateTime(new DateTime());
+			chatOpsRepository.save(repo);
+			log("Finished", start);
 
-        }
-    }
+		}
+	}
 
-    private List<ChatOpsRepo> enabledRepos(Collector collector) {
-        return chatOpsRepository.findEnabledChatOpsRepos(collector.getId());
-    }
+	private List<ChatOpsRepo> enabledRepos(Collector collector) {
+		return chatOpsRepository.findEnabledChatOpsRepos(collector.getId());
+	}
 
 }
