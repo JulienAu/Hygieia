@@ -244,6 +244,9 @@ function getjsonComparaison(id , idDashboard , title) {
                         getjsonConf('Conf.json' ,function(array3) {
                          array[1] += array[31];
                          array[2] += array[32];
+                         if(array[3] == 0){
+                          array[3] = array[12];
+                         }
                          for (i = 31; i < 33; i++) {
                             if(!(array2[i]=== undefined)){
                                 array2[i-30] += array2[i];
