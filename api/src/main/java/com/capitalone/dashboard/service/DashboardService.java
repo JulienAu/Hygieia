@@ -56,6 +56,7 @@ public interface DashboardService {
      * @param collectorItemIds List of unique identifier of the CollectorItem
      * @return Component
      */
+    
     Component associateCollectorToComponent(ObjectId componentId, List<ObjectId> collectorItemIds);
 
     /**
@@ -102,6 +103,9 @@ public interface DashboardService {
      */
     
     String getDashboardOwner(String dashboardName);
+
+
+	
 
 }
 

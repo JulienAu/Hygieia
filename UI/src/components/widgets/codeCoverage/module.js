@@ -32,7 +32,7 @@
 
     function getState(config) {
         // make sure config values are set
-        return localTesting || (config.id && config.options.buildDurationThreshold && config.options.consecutiveFailureThreshold) ?
+        return localTesting || (config.id && config.options.CodeCoverage && config.options.CodeCoverageFunctional) ?
             widget_state.READY :
             widget_state.CONFIGURE;
     }

@@ -71,6 +71,7 @@ public class DashboardController {
     @RequestMapping(value = "/dashboard/{id}/widget", method = POST,
             consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<WidgetResponse> addWidget(@PathVariable ObjectId id, @RequestBody WidgetRequest request) {
+   
         Component component = dashboardService.associateCollectorToComponent(
                 request.getComponentId(), request.getCollectorItemIds());
 
@@ -84,12 +85,13 @@ public class DashboardController {
     public ResponseEntity<WidgetResponse> updateWidget(@PathVariable ObjectId id,
                                                        @PathVariable ObjectId widgetId,
                                                        @RequestBody WidgetRequest request) {
-        Component component = dashboardService.associateCollectorToComponent(
-                request.getComponentId(), request.getCollectorItemIds());
-
-        Dashboard dashboard = dashboardService.get(id);
+    	Dashboard dashboard = dashboardService.get(id);
+        
         Widget widget = request.updateWidget(dashboardService.getWidget(dashboard, widgetId));
         widget = dashboardService.updateWidget(dashboard, widget);
+        
+        Component component = dashboardService.associateCollectorToComponent(
+                request.getComponentId(), request.getCollectorItemIds());
 
         return ResponseEntity.ok().body(new WidgetResponse(component, widget));
     }

@@ -17,19 +17,19 @@
         ctrl.toolsDropdownPlaceholder = 'Loading Build Jobs...';
         ctrl.toolsDropdownDisabled = true;
 
-        ctrl.buildDurationThreshold = 3;
-        ctrl.buildConsecutiveFailureThreshold = 5;
+        ctrl.CodeCoverage = 'UT_Coverage';
+        ctrl.CodeCoverageFunctional = 'Functional_Coverage';
 
         ctrl.submitted = false;
 
         // set values from config
         if (widgetConfig) {
-            if (widgetConfig.options.buildDurationThreshold) {
-                ctrl.buildDurationThreshold = widgetConfig.options.buildDurationThreshold;
+            if (widgetConfig.options.CodeCoverage) {
+                ctrl.CodeCoverage = widgetConfig.options.CodeCoverage;
             }
 
-            if (widgetConfig.options.consecutiveFailureThreshold) {
-                ctrl.buildConsecutiveFailureThreshold = widgetConfig.options.consecutiveFailureThreshold;
+            if (widgetConfig.options.CodeCoverageFunctional) {
+                ctrl.CodeCoverageFunctional = widgetConfig.options.CodeCoverageFunctional;
             }
         }
 
@@ -94,8 +94,8 @@
                     name: 'codeCoverage',
                     options: {
                         id: widgetConfig.options.id,
-                        //buildDurationThreshold: parseFloat(form.buildDurationThreshold.value),
-                       // consecutiveFailureThreshold: parseFloat(form.buildConsecutiveFailureThreshold.value)
+                        CodeCoverage: form.CodeCoverage.value,
+                        CodeCoverageFunctional: form.CodeCoverageFunctional.value
                     },
                     componentId: modalData.dashboard.application.components[0].id,
                     collectorItemId: form.collectorItemId.value

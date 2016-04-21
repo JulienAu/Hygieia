@@ -50,7 +50,7 @@ public class Component extends BaseModel {
         return collectorItems.get(type);
     }
 
-    public void addCollectorItem(CollectorType collectorType, CollectorItem collectorItem) {
+	public void addCollectorItem(CollectorType collectorType, CollectorItem collectorItem) {
         // Currently only one collectorItem per collectorType is supported
         if (collectorItems.get(collectorType) == null) {
             collectorItems.put(collectorType, Arrays.asList(collectorItem));

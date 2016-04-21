@@ -13,40 +13,38 @@
             <p class="help-block" ng-if="configForm.collectorItemId.$error.required">Please select a collector</p>
         </div>
 
-        <div class="form-group text-center" ng-class="{'has-error': configForm.buildDurationThreshold.$invalid && codeCoverageConfig.submitted}">
-            <label class="modal-label">Build duration threshold:</label>
+        <div class="form-group text-center" ng-class="{'has-error': configForm.CodeCoverage.$invalid && codeCoverageConfig.submitted}">
+            <label class="modal-label">Path Code Coverage UT</label>
             <input
                     type="text"
-                    name="buildDurationThreshold"
+                    name="CodeCoverage"
                     class="form-control-inline text-center"
-                    ng-model="codeCoverageConfig.buildDurationThreshold"
-                    size="1"
-                    minlength="1"
-                    maxlength="3"
-                    pattern="\d*\.?\d*"
-                    required>&nbsp;&nbsp;&nbsp;minutes
+                    ng-model="codeCoverageConfig.CodeCoverage"
+                    size="20"
+                    minlength="5"
+                    maxlength="100"
+                    required>&nbsp;&nbsp;&nbsp;
 
-            <p class="help-block" ng-if="configForm.buildDurationThreshold.$error.required">Build threshold is required</p>
-            <p class="help-block" ng-if="configForm.buildDurationThreshold.$error.pattern">Please enter a number</p>
+            <p class="help-block" ng-if="configForm.CodeCoverage.$error.required">Code Coverage path is required</p>
+            <p class="help-block" ng-if="configForm.CodeCoverage.$error.pattern">Please enter a path</p>
         </div>
 
         <hr/>
 
-        <div class="form-group text-center" ng-class="{'has-error': configForm.buildConsecutiveFailureThreshold.$invalid && codeCoverageConfig.submitted}">
-            <label class="modal-label">Alert takeover criteria:</label>
+        <div class="form-group text-center" ng-class="{'has-error': configForm.CodeCoverageFunctional.$invalid && codeCoverageConfig.submitted}">
+            <label class="modal-label">Path Code Coverage Functional</label>
             <input
                     type="text"
-                    name="buildConsecutiveFailureThreshold"
+                    name="CodeCoverageFunctional"
                     class="form-control-inline text-center"
-                    ng-model="codeCoverageConfig.buildConsecutiveFailureThreshold"
-                    size="1"
-                    minlength="1"
-                    maxlength="3"
-                    pattern="\d*\.?\d*"
-                    required>&nbsp;&nbsp;&nbsp;consecutive build fails
+                    ng-model="codeCoverageConfig.CodeCoverageFunctional"
+                    size="20"
+                    minlength="5"
+                    maxlength="100"
+                    required>&nbsp;&nbsp;&nbsp;
 
-            <p class="help-block" ng-if="configForm.buildConsecutiveFailureThreshold.$error.required">Takeover criteria is required</p>
-            <p class="help-block" ng-if="configForm.buildConsecutiveFailureThreshold.$error.pattern">Please enter a number</p>
+            <p class="help-block" ng-if="configForm.CodeCoverageFunctional.$error.required">Code Coverage functional path is required</p>
+            <p class="help-block" ng-if="configForm.CodeCoverageFunctional.$error.pattern">Please enter a path</p>
         </div>
 
         <div class="button-row row text-center">
