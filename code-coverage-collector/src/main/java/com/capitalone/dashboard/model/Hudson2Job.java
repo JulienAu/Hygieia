@@ -7,8 +7,6 @@ public class Hudson2Job extends CollectorItem {
     private static final String INSTANCE_URL = "instanceUrl";
     private static final String JOB_NAME = "jobName";
     private static final String JOB_URL = "jobUrl";
-    //private static final String UT_COVERAGE = "utCoverage";
-    //private static final String FT_COVERAGE = "ftCoverage" ;
 
     public String getInstanceUrl() {
         return (String) getOptions().get(INSTANCE_URL);
@@ -33,23 +31,7 @@ public class Hudson2Job extends CollectorItem {
     public void setJobUrl(String jobUrl) {
         getOptions().put(JOB_URL, jobUrl);
     }
-    /*
-    public String getUtCoverage() {
-        return (String) getOptions().get(UT_COVERAGE);
-    }
-
-    public void setUtCoverage(String utCoverage) {
-        getOptions().put(UT_COVERAGE, utCoverage);
-    }
- 
-    public String getftCoverage() {
-        return (String) getOptions().get(FT_COVERAGE);
-    }
-
-    public void setFtCoverage(String ftCoverage) {
-        getOptions().put(FT_COVERAGE, ftCoverage);
-    }
- */
+    
     
 	@Override
     public boolean equals(Object o) {

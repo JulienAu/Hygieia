@@ -5,7 +5,6 @@ import com.capitalone.dashboard.model.Hudson2Job;
 import com.capitalone.dashboard.util.Supplier;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
@@ -26,9 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -107,19 +104,6 @@ public class DefaultHudsonClientTests {
                 eq(headers), eq(String.class));
     }
 
-    @Test
-    public void verifyGetLogUrl() throws Exception {
-        HttpEntity<Object> headers = new HttpEntity<Object>(defaultHudsonClient.createHeaders("does:matter"));
-        when(rest.exchange(Matchers.any(URI.class), eq(HttpMethod.GET),
-                eq(headers), eq(String.class)))
-                .thenReturn(new ResponseEntity<>("", HttpStatus.OK));
-
-        settings.setApiKey("matter");
-        settings.setUsername("does");
-        defaultHudsonClient.getLog("http://jenkins.com");
-        verify(rest).exchange(eq(URI.create("http://jenkins.com/consoleText")), eq(HttpMethod.GET),
-                eq(headers), eq(String.class));
-    }
 
     @Test
     public void instanceJobs_emptyResponse_returnsEmptyMap() {
@@ -170,6 +154,46 @@ public class DefaultHudsonClientTests {
         Build2 build = hudsonClient.getBuildDetails(URL_TEST2, null);
         assertThat(build.getNumber(), is("383"));
         assertThat(build.getBuildUrl(), is(URL_TEST2));
+        
+
+    }
+    
+    @Test
+    public void codeCoverage() throws Exception {
+    	when(rest.exchange(Matchers.any(URI.class), eq(HttpMethod.GET), Matchers.any(HttpEntity.class), eq(String.class)))
+        .thenReturn(new ResponseEntity<>(getJson("buildDetails_full.json"), HttpStatus.OK));
+    	Build2 build = hudsonClient.getBuildDetails("http://pic2.s1.p.fti.net/view/SDFY/view/PNS%20C++/job/WS_31_PACKAGE_KPI/lastBuild/", "http://pic2.s1.p.fti.net/job/WS_31_PACKAGE_KPI/");
+  
+        assertNotNull(build.getBranchCoverage());
+        assertNotNull(build.getBranchCoverageUnitaire());
+        assertNotNull(build.getBytesLostValgrind());
+        assertNotNull(build.getDuplicateCodeHigh());
+        assertNotNull(build.getDuplicateCodeMedium());
+        assertNotNull(build.getDuplicateCodeLow());
+        assertNotNull(build.getLocLanguage());
+        assertNotNull(build.getLocFile());
+        assertNotNull(build.getLoc());
+        assertNotNull(build.getLineCoverageUnitaire());
+        assertNotNull(build.getLineCoverage());
+        assertNotNull(build.getFunctionCoverageUnitaire());
+        assertNotNull(build.getFunctionCoverage());
+        assertNotNull(build.getDuplicateCodeWarnings());
+        assertNotNull(build.getClassesCoverageCobertura());
+        assertNotNull(build.getFileCoverageCobertura());
+        assertNotNull(build.getPackageCoverageCobertura());
+        assertNotNull(build.getLineCoverageCobertura());
+        
+        
+
+    }
+    
+    
+    @Test
+    public void buildingBuild() throws Exception {
+        when(rest.exchange(Matchers.any(URI.class), eq(HttpMethod.GET), Matchers.any(HttpEntity.class), eq(String.class)))
+                .thenReturn(new ResponseEntity<>(getJson("buildBuildingDetails_full.json"), HttpStatus.OK));
+  
+        assertEquals(hudsonClient.getBuildDetails(URL_TEST2, null), null);
 
     }
 

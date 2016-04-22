@@ -21,7 +21,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
 
@@ -193,20 +192,6 @@ public class DefaultHudson2Client implements Hudson2Client {
 
 
 
-	/* Function name need to be changed */
-	protected boolean cppCheck(String sUrl){
-		try{
-			makeRestCall(sUrl);
-			return true;
-		} catch (HttpClientErrorException rce) {
-			LOG.info("Metrics Not found");
-			return false;
-		} catch (MalformedURLException mfe) {
-			return false;
-		}
-
-
-	}
 	protected ResponseEntity<String> makeRestCall(String sUrl) throws MalformedURLException{
 		URI thisuri = URI.create(sUrl);
 		String userInfo = thisuri.getUserInfo();
@@ -237,15 +222,6 @@ public class DefaultHudson2Client implements Hudson2Client {
 		return headers;
 	}
 
-	protected String getLog(String buildUrl) {
-		try {
-			return makeRestCall(joinURL(buildUrl, "consoleText")).getBody();
-		} catch (MalformedURLException mfe) {
-			LOG.error("malformed url for build log", mfe);
-		}
-
-		return "";
-	}
 
 	// join a base url to another path or paths - this will handle trailing or non-trailing /'s
 	public static String joinURL(String base, String ... paths) throws MalformedURLException {
@@ -260,7 +236,7 @@ public class DefaultHudson2Client implements Hudson2Client {
 		return result.toString();
 	}
 
-	private List<String> codeCoverage(String url) throws IOException{
+	protected List<String> codeCoverage(String url) throws IOException{
 		ArrayList<String> res = new ArrayList<String>();
 		try{
 			Document doc = Jsoup.connect(url).get();

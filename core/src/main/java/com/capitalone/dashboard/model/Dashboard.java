@@ -2,6 +2,8 @@ package com.capitalone.dashboard.model;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.capitalone.dashboard.repository.CollectorRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,12 +66,14 @@ public class Dashboard extends BaseModel {
 		this.owner = owner;
 	}
 	////////////////////////////////////////Config code coverage////////////////////////////////////
-	public void updateDashboard(){
+	public void updateDashboard(CollectorRepository collectorRepository){
 		List<Widget> widgets = this.getWidgets();
 		for (Widget widget2 : widgets){
 			if(widget2.getName().equals("codeCoverage") && !this.getApplication().getComponents().get(0).getCollectorItems(CollectorType.Build2).isEmpty()){
-				this.getApplication().getComponents().get(0).getCollectorItems(CollectorType.Build2).get(0).getOptions().putAll(widget2.getOptions());
-
+				CollectorItem collectorItem = this.getApplication().getComponents().get(0).getCollectorItems(CollectorType.Build2).get(0);
+				Collector collector = collectorRepository.findOne(collectorItem.getCollectorId());
+				collectorItem.getOptions().putAll(widget2.getOptions());
+				collectorItem.setCollector(collector);
 			}
 		}
 	}

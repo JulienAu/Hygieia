@@ -146,24 +146,19 @@ public class DefaultHudsonClient implements HudsonClient {
 			if(cpp){
 				ResponseEntity<String> resultCpp = makeRestCall(urlCppCheck);
 				returnCpp = resultCpp.getBody();
-
 			}
 			if(test){
 				ResponseEntity<String> resultTest = makeRestCall(urlTest);
 				returnJSONTest = resultTest.getBody();
 			}
 			String returnJSON = result.getBody();
-			//String returnJSONSucess = resultSuccess.getBody();
-
 			JSONParser parser = new JSONParser();
 			JSONParser parser2 = new JSONParser();
 			JSONParser parser3 = new JSONParser();
 			try {
-
 				JSONObject buildJsonCpp = (JSONObject) parser3.parse(returnCpp);
 				JSONObject buildJson = (JSONObject) parser.parse(returnJSON);
 				Boolean building = (Boolean) buildJson.get("building");
-				//JSONObject buildJsonSucess = (JSONObject) parser.parse(returnJSONSucess);
 				JSONObject buildJsonTest = (JSONObject) parser2.parse(returnJSONTest);
 				// Ignore jobs that are building
 				if (!building) {
@@ -179,7 +174,6 @@ public class DefaultHudsonClient implements HudsonClient {
 					/*if (settings.isSaveLog()) {
 						build.setLog(getLog(buildUrl));
 					}*/
-
 					if(test){
 						build.setFailCount(buildJsonTest.get("failCount").toString());
 
@@ -191,8 +185,6 @@ public class DefaultHudsonClient implements HudsonClient {
 					if(buildJsonTest.get("totalCount") != null && test){
 						build.setTotalCount(buildJsonTest.get("totalCount").toString());
 					}
-
-
 					if(cpp){
 						build.setNumberErrorSeverityCpp(buildJsonCpp.get("numberErrorSeverity").toString());
 						build.setNumberWarningSeverityCpp(buildJsonCpp.get("numberWarningSeverity").toString());

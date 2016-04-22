@@ -22,6 +22,8 @@ import org.springframework.scheduling.TaskScheduler;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -110,7 +112,7 @@ public class HudsonCollectorTaskTests {
 
         verify(buildRepository, never()).save(build);
     }
-
+/*
     @Ignore @Test
     public void collect_jobEnabled_newBuild_buildAdded() {
         HudsonCollector collector = collectorWithOneServer();
@@ -126,6 +128,48 @@ public class HudsonCollectorTaskTests {
         task.collect(collector);
 
         verify(buildRepository, times(1)).save(build);
+    }*/
+    @Test
+    public void collect_jobEnabled_newBuild_buildAdded(){
+        HudsonCollector collector = collectorWithOneServer();
+        HudsonJob job = hudsonJob("Test", SERVER1, "http://jenkins.net/job/Test");
+        job.setId(ObjectId.get());
+        Build build = build("383", "http://jenkins.net/job/Test");
+        when(hudsonClient.getInstanceJobs(SERVER1)).thenReturn(oneJobWithBuilds(job, build));
+        when(hudsonJobRepository.findEnabledHudsonJobs(collector.getId(), SERVER1))
+                .thenReturn(Arrays.asList(job));
+        when(buildRepository.findByCollectorItemIdAndNumber(job.getId(), build.getNumber())).thenReturn(null);
+        when(hudsonClient.getBuildDetails(build.getBuildUrl(), "http://jenkins.net/job/Test")).thenReturn(build);
+        when(dbComponentRepository.findAll()).thenReturn(components());
+        task.collect(collector);
+   
+        verify(buildRepository, times(1)).save(build);
+    }
+    
+    @Test
+    public void delete_jobs(){
+        HudsonCollector collector = collectorWithOneServer();
+        HudsonJob job = hudsonJob("Test","http://jenkins2.net/job", "http://jenkins.net/job/Test");
+        Set<ObjectId> udId = new HashSet<>();
+		udId.add(collector.getId());
+        job.setId(ObjectId.get());
+        Build build = build("383", "http://jenkins.net/job/Test");
+        List<HudsonJob> deleteJobList = new ArrayList<>();
+        List<HudsonJob> jobList = new ArrayList<>();
+        jobList.add(job);
+        deleteJobList.add(job);
+        when(hudsonJobRepository.findByCollectorIdIn(udId)).thenReturn(jobList);
+        when(hudsonClient.getInstanceJobs(SERVER1)).thenReturn(oneJobWithBuilds(job, build));
+        when(hudsonJobRepository.findEnabledHudsonJobs(collector.getId(), SERVER1))
+                .thenReturn(Arrays.asList(job));
+        when(buildRepository.findByCollectorItemIdAndNumber(job.getId(), build.getNumber())).thenReturn(null);
+        when(hudsonClient.getBuildDetails(build.getBuildUrl(), "http://jenkins.net/job/Test")).thenReturn(build);
+        when(dbComponentRepository.findAll()).thenReturn(components());
+        
+        
+        task.collect(collector);
+        verify(hudsonJobRepository, times(1)).delete(deleteJobList);
+        
     }
 
     private HudsonCollector collectorWithOneServer() {

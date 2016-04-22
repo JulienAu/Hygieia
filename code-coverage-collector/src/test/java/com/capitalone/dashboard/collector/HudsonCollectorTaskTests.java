@@ -1,5 +1,4 @@
 package com.capitalone.dashboard.collector;
-
 import com.capitalone.dashboard.model.Build2;
 import com.capitalone.dashboard.model.Component;
 import com.capitalone.dashboard.model.Hudson2Collector;
@@ -9,9 +8,10 @@ import com.capitalone.dashboard.repository.ComponentRepository;
 import com.capitalone.dashboard.repository.Hudson2CollectorRepository;
 import com.capitalone.dashboard.repository.Hudson2JobRepository;
 import com.google.common.collect.Sets;
-
+import static org.junit.Assert.*;
 import org.bson.types.ObjectId;
-import org.junit.Ignore;
+
+import java.util.HashSet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.scheduling.TaskScheduler;
 
+import java.util.List;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class HudsonCollectorTaskTests {
     @Mock private Hudson2Client hudsonClient;
     @Mock private Hudson2Settings hudsonSettings;
     @Mock private ComponentRepository dbComponentRepository;
+    @Mock private Hudson2Job Hudson2Job;
 
     @InjectMocks private Hudson2CollectorTask task;
 
@@ -50,6 +52,8 @@ public class HudsonCollectorTaskTests {
         task.collect(new Hudson2Collector());
         verifyZeroInteractions(hudsonClient, buildRepository);
     }
+
+
 
     @Test
     public void collect_noJobsOnServer_nothingAdded() throws MalformedURLException, IOException {
@@ -113,27 +117,56 @@ public class HudsonCollectorTaskTests {
         verify(buildRepository, never()).save(build);
     }
 
-    @Ignore @Test
+    @Test
     public void collect_jobEnabled_newBuild_buildAdded() throws MalformedURLException, IOException {
         Hudson2Collector collector = collectorWithOneServer();
         Hudson2Job job = hudsonJob("Test", SERVER1, "http://jenkins.net/job/Test");
         job.setId(ObjectId.get());
         Build2 build = build("383", "http://jenkins.net/job/Test");
-
+        assertNotNull(build);
         when(hudsonClient.getInstanceJobs(SERVER1)).thenReturn(oneJobWithBuilds(job, build));
         when(hudsonJobRepository.findEnabledHudsonJobs(collector.getId(), SERVER1))
                 .thenReturn(Arrays.asList(job));
         when(buildRepository.findByCollectorItemIdAndNumber(job.getId(), build.getNumber())).thenReturn(null);
-        when(hudsonClient.getBuildDetails(build.getBuildUrl(), null)).thenReturn(build);
+        when(hudsonClient.getBuildDetails(build.getBuildUrl(), "http://jenkins.net/job/Test")).thenReturn(build);
         when(dbComponentRepository.findAll()).thenReturn(components());
         task.collect(collector);
-
+   
         verify(buildRepository, times(1)).save(build);
     }
+    
+    @Test
+    public void delete_jobs() throws MalformedURLException, IOException {
+        Hudson2Collector collector = collectorWithOneServer();
+        Hudson2Job job = hudsonJob("Test","http://jenkins2.net/job", "http://jenkins.net/job/Test");
+        Set<ObjectId> udId = new HashSet<>();
+		udId.add(collector.getId());
+        job.setId(ObjectId.get());
+        Build2 build = build("383", "http://jenkins.net/job/Test");
+        List<Hudson2Job> deleteJobList = new ArrayList<>();
+        List<Hudson2Job> jobList = new ArrayList<>();
+        jobList.add(job);
+        deleteJobList.add(job);
+        when(hudsonJobRepository.findByCollectorIdIn(udId)).thenReturn(jobList);
+        when(hudsonClient.getInstanceJobs(SERVER1)).thenReturn(oneJobWithBuilds(job, build));
+        when(hudsonJobRepository.findEnabledHudsonJobs(collector.getId(), SERVER1))
+                .thenReturn(Arrays.asList(job));
+        when(buildRepository.findByCollectorItemIdAndNumber(job.getId(), build.getNumber())).thenReturn(null);
+        when(hudsonClient.getBuildDetails(build.getBuildUrl(), "http://jenkins.net/job/Test")).thenReturn(build);
+        when(dbComponentRepository.findAll()).thenReturn(components());
+        
+        
+        task.collect(collector);
+        verify(hudsonJobRepository, times(1)).delete(deleteJobList);
+        
+    }
+    
+
 
     private Hudson2Collector collectorWithOneServer() {
         return Hudson2Collector.prototype(Arrays.asList(SERVER1));
     }
+    
 
     private Map<Hudson2Job, Set<Build2>> oneJobWithBuilds(Hudson2Job job, Build2... builds) {
         Map<Hudson2Job, Set<Build2>> jobs = new HashMap<>();

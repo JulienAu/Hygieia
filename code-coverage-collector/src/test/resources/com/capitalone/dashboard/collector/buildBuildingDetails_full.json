@@ -1,14 +1,8 @@
 {
-  "building": false,
+  "building": true,
   "duration": 2698495,
   "number": 2483,
   "result": "FAILURE",
-  "failCount": "0",
-  "skipCount": "0",
-  "passCount": "486",
-  "totalCount": "none",
-  "numberErrorSeverity": 2,
-  "numberWarningSeverity": 4,
   "timestamp": 1421281415000,
   "url": "https://builds.apache.org/job/Lucene-Solr-Tests-5.x-Java7/2483/",
   "changeSet": {

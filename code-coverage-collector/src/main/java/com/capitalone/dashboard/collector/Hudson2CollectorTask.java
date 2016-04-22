@@ -98,11 +98,11 @@ public class Hudson2CollectorTask extends CollectorTask<Hudson2Collector> {
 	 * @param collector the {@link Hudson2Collector}
 	 */
 
-	private void clean(Hudson2Collector collector) {
+	protected void clean(Hudson2Collector collector) {
 
 		// First delete jobs that will be no longer collected because servers have moved etc.
 		deleteUnwantedJobs(collector);
-		Set<ObjectId> uniqueIDs = new HashSet<>();
+		Set<ObjectId> uniqueIDs = uniqueIDs();
 		for (com.capitalone.dashboard.model.Component comp : dbComponentRepository
 				.findAll()) {
 			if (comp.getCollectorItems() == null
@@ -227,5 +227,10 @@ public class Hudson2CollectorTask extends CollectorTask<Hudson2Collector> {
 	private boolean isNewBuild(Hudson2Job job, Build2 build) {
 		return buildRepository.findByCollectorItemIdAndNumber(job.getId(),
 				build.getNumber()) == null;
+	}
+	
+	/** Help for Unit test**/
+	protected Set<ObjectId> uniqueIDs (){
+		return new HashSet<>();
 	}
 }

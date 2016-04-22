@@ -61,7 +61,7 @@ public class DashboardServiceImpl implements DashboardService {
 
 	@Override
 	public Dashboard create(Dashboard dashboard) {
-		//dashboard.updateDashboard();
+		//dashboard.updateDashboard(collectorRepository);
 		componentRepository.save(dashboard.getApplication().getComponents());
 		return dashboardRepository.save(dashboard);
 	}
@@ -123,7 +123,6 @@ public class DashboardServiceImpl implements DashboardService {
 			CollectorItem collectorItem = collectorItemRepository.findOne(collectorItemId);
 			Collector collector = collectorRepository.findOne(collectorItem.getCollectorId());
 			component.addCollectorItem(collector.getCollectorType(), collectorItem);
-
 			if (!collectorItem.isEnabled()) {
 				toSaveCollectorItemList.remove(collectorItem);
 				collectorItem.setEnabled(true);
@@ -155,16 +154,6 @@ public class DashboardServiceImpl implements DashboardService {
 	public Widget updateWidget(Dashboard dashboard, Widget widget) {
 		int index = dashboard.getWidgets().indexOf(widget);
 		dashboard.getWidgets().set(index, widget);
-		/*
-		///////////////////////////////////////////////////////////////////////Config code coverage
-		List<Widget> widgets = dashboard.getWidgets();
-    	for (Widget widget2 : widgets){
-    		if(widget2.getName() ==  "codeCoverage"){
-		dashboard.getApplication().getComponents().get(0).getCollectorItems(CollectorType.Build2).get(0).getOptions().putAll(widget2.getOptions());
-    		}
-    	}
-    	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    	*/
 		dashboardRepository.save(dashboard);
 		return widget;
 	}

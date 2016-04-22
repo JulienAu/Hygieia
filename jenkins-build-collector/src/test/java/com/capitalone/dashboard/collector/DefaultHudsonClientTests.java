@@ -7,7 +7,6 @@ import com.capitalone.dashboard.model.SCM;
 import com.capitalone.dashboard.util.Supplier;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
@@ -33,7 +32,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.eq;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,6 +46,7 @@ public class DefaultHudsonClientTests {
     private DefaultHudsonClient defaultHudsonClient;
 
     private static final String URL_TEST = "URL";
+    private static final String URL_TEST2 = "http://jenkins.net/job/Test/383/";
 
     @Before
     public void init() {
@@ -174,16 +174,16 @@ public class DefaultHudsonClientTests {
         assertThat(jobIt.hasNext(), is(false));
     }
 
-    @Ignore @Test
+    @Test
     public void buildDetails_full() throws Exception {
         when(rest.exchange(Matchers.any(URI.class), eq(HttpMethod.GET), Matchers.any(HttpEntity.class), eq(String.class)))
                 .thenReturn(new ResponseEntity<>(getJson("buildDetails_full.json"), HttpStatus.OK));
-
-        Build build = hudsonClient.getBuildDetails(URL_TEST, null);
+        
+        Build build = hudsonClient.getBuildDetails("http://pic2.s1.p.fti.net/job/WS_31_PACKAGE_KPI/lastSuccessfulBuild/", "http://pic2.s1.p.fti.net/job/WS_31_PACKAGE_KPI/");
 
         assertThat(build.getTimestamp(), notNullValue());
         assertThat(build.getNumber(), is("2483"));
-        assertThat(build.getBuildUrl(), is(URL_TEST));
+        assertThat(build.getBuildUrl(), is("http://pic2.s1.p.fti.net/job/WS_31_PACKAGE_KPI/lastSuccessfulBuild/"));
         assertThat(build.getArtifactVersionNumber(), nullValue());
         assertThat(build.getStartTime(), is(1421281415000L));
         assertThat(build.getEndTime(), is(1421284113495L));
@@ -191,6 +191,7 @@ public class DefaultHudsonClientTests {
         assertThat(build.getBuildStatus(), is(BuildStatus.Failure));
         assertThat(build.getStartedBy(), is("ab"));
         assertThat(build.getSourceChangeSet().size(), is(2));
+        assertThat(build.getStartTime(), notNullValue());
 
         // ChangeSet 1
         SCM scm = build.getSourceChangeSet().get(0);
@@ -211,6 +212,15 @@ public class DefaultHudsonClientTests {
         assertThat(scm.getNumberOfChanges(), is(5L));
     }
 
+    @Test
+    public void buildingBuild() throws Exception {
+        when(rest.exchange(Matchers.any(URI.class), eq(HttpMethod.GET), Matchers.any(HttpEntity.class), eq(String.class)))
+                .thenReturn(new ResponseEntity<>(getJson("buildBuildingDetails_full.json"), HttpStatus.OK));
+  
+        assertEquals(hudsonClient.getBuildDetails(URL_TEST2, "http://jenkins.net/job/Test/"), null);
+
+    }
+    
     private void assertBuild(Build build, String number, String url) {
         assertThat(build.getNumber(), is(number));
         assertThat(build.getBuildUrl(), is(url));
