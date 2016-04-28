@@ -4,7 +4,9 @@ import com.capitalone.dashboard.model.Build2;
 import com.capitalone.dashboard.model.Hudson2Job;
 import com.capitalone.dashboard.util.Supplier;
 import org.apache.commons.io.IOUtils;
+import org.jsoup.Jsoup;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
@@ -17,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestOperations;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -41,6 +44,7 @@ public class DefaultHudsonClientTests {
 
     private static final String URL_TEST = "URL";
     private static final String URL_TEST2 = "http://jenkins.net/job/Test/383/";
+    private static final String JOBS_URL_DETAILS = "/Functional_Coverage/index.html";
 
     @Before
     public void init() {
@@ -158,11 +162,44 @@ public class DefaultHudsonClientTests {
 
     }
     
+    @Test @Ignore
+    public void codeCoverage2() throws Exception {
+    	when(rest.exchange(Matchers.any(URI.class), eq(HttpMethod.GET), Matchers.any(HttpEntity.class), eq(String.class)))
+        .thenReturn(new ResponseEntity<>(getJson("buildDetails_full.json"), HttpStatus.OK));
+    	String url = DefaultHudson2Client.joinURL("http://jenkins.net/job/Test/383/", JOBS_URL_DETAILS);
+    	File input = new File("CodeCoverageUnitaire.html");
+    	when(defaultHudsonClient.getDocumentHelper(url)).thenReturn(Jsoup.parse(input, "UTF-8", "http://example.com/")); 
+    	Build2 build = hudsonClient.getBuildDetails("http://jenkins.net/job/Test/383/", "http://jenkins.net/job/Test/");
+  
+       // assertNotNull(build.getBranchCoverage());
+        assertNotNull(build.getBranchCoverageUnitaire());
+        //assertNotNull(build.getBytesLostValgrind());
+        //assertNotNull(build.getDuplicateCodeHigh());
+        //assertNotNull(build.getDuplicateCodeMedium());
+        //assertNotNull(build.getDuplicateCodeLow());
+        /*assertNotNull(build.getLocLanguage());
+        assertNotNull(build.getLocFile());
+        assertNotNull(build.getLoc());*/
+        assertNotNull(build.getLineCoverageUnitaire());
+       // assertNotNull(build.getLineCoverage());
+        assertNotNull(build.getFunctionCoverageUnitaire());
+       /* assertNotNull(build.getFunctionCoverage());
+        assertNotNull(build.getDuplicateCodeWarnings());
+        assertNotNull(build.getClassesCoverageCobertura());
+        assertNotNull(build.getFileCoverageCobertura());
+        assertNotNull(build.getPackageCoverageCobertura());
+        assertNotNull(build.getLineCoverageCobertura());*/
+        
+        
+
+    }
+    
     @Test
     public void codeCoverage() throws Exception {
     	when(rest.exchange(Matchers.any(URI.class), eq(HttpMethod.GET), Matchers.any(HttpEntity.class), eq(String.class)))
         .thenReturn(new ResponseEntity<>(getJson("buildDetails_full.json"), HttpStatus.OK));
-    	Build2 build = hudsonClient.getBuildDetails("http://pic2.s1.p.fti.net/view/SDFY/view/PNS%20C++/job/WS_31_PACKAGE_KPI/lastBuild/", "http://pic2.s1.p.fti.net/job/WS_31_PACKAGE_KPI/");
+   
+    	Build2 build = hudsonClient.getBuildDetails("http://pic2.s1.p.fti.net/view/SDFY/view/PNS%20C++/job/WS_31_PACKAGE_KPI/lastSuccessfulBuild/", "http://pic2.s1.p.fti.net/view/SDFY/view/PNS%20C++/job/WS_31_PACKAGE_KPI/");
   
         assertNotNull(build.getBranchCoverage());
         assertNotNull(build.getBranchCoverageUnitaire());
@@ -187,8 +224,8 @@ public class DefaultHudsonClientTests {
 
     }
     
-    
-    @Test
+
+	@Test
     public void buildingBuild() throws Exception {
         when(rest.exchange(Matchers.any(URI.class), eq(HttpMethod.GET), Matchers.any(HttpEntity.class), eq(String.class)))
                 .thenReturn(new ResponseEntity<>(getJson("buildBuildingDetails_full.json"), HttpStatus.OK));

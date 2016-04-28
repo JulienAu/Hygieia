@@ -9,6 +9,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -239,7 +240,7 @@ public class DefaultHudson2Client implements Hudson2Client {
 	protected List<String> codeCoverage(String url) throws IOException{
 		ArrayList<String> res = new ArrayList<String>();
 		try{
-			Document doc = Jsoup.connect(url).get();
+			Document doc = getDocumentHelper(url);
 			Element elementsByTag = doc.getElementsByTag("body").get(0);
 			Elements rows = elementsByTag.getElementsByTag("td");
 			for(Element row : rows) {
@@ -254,10 +255,10 @@ public class DefaultHudson2Client implements Hudson2Client {
 		return res;
 	}
 
-	private static List<String> coberturaCoverageReport(String url) throws IOException{
+	private  List<String> coberturaCoverageReport(String url) throws IOException{
 		List<String> res = new ArrayList<String>();	
 		try{
-			Document doc = Jsoup.connect(url).get();	
+			Document doc = getDocumentHelper(url);	
 			Elements elementsByTag = doc.getElementsByTag("body");
 			for(Element row1 : elementsByTag) {
 				Element row = row1.getElementsByTag("table").get(0);
@@ -275,10 +276,10 @@ public class DefaultHudson2Client implements Hudson2Client {
 		return res;
 	}
 
-	private static List<String> valgrindReport(String url) throws IOException{
+	private List<String> valgrindReport(String url) throws IOException{
 		List<String> res = new ArrayList<String>();	
 		try{
-			Document doc = Jsoup.connect(url).get();	
+			Document doc = getDocumentHelper(url);	
 			Elements elementsByTag = doc.getElementsByTag("body");
 			for(Element row1 : elementsByTag) {
 
@@ -300,10 +301,10 @@ public class DefaultHudson2Client implements Hudson2Client {
 	}
 
 
-	private static List<String> dryResultAll(String url) throws IOException{
+	private  List<String> dryResultAll(String url) throws IOException{
 		List<String> res = new ArrayList<String>();	
 		try{
-			Document doc = Jsoup.connect(url).get();	
+			Document doc = getDocumentHelper(url);	
 			Elements elementsByTag = doc.getElementsByTag("body");
 			for(Element row1 : elementsByTag) {
 				Element row = row1.getElementsByTag("table").get(1);
@@ -343,10 +344,10 @@ public class DefaultHudson2Client implements Hudson2Client {
 	}
 
 
-	private static List<String> lOC(String url) throws IOException{
+	private  List<String> lOC(String url) throws IOException{
 		List<String> res = new ArrayList<String>();	
 		try{
-			Document doc = Jsoup.connect(url).get();	
+			Document doc = getDocumentHelper(url);	
 			Elements elementsByTag = doc.getElementsByTag("body");
 			for(Element row1 : elementsByTag) {
 				Elements row = row1.getElementsByTag("table").get(0).getElementsByTag("td");
@@ -379,6 +380,18 @@ public class DefaultHudson2Client implements Hudson2Client {
 		}
 		return res;
 	}
+	
+	@SuppressWarnings("PMD.CloseResource")
+	Document getDocumentHelper(String globalScheduleURL) throws IOException {
+	       Connection con = Jsoup.connect(globalScheduleURL).timeout(10000);
+	       Connection.Response resp = con.execute();
+	       Document doc = null;
+	       if (resp.statusCode() == 200) {
+	        	doc = con.get();
+	       }
+	       return doc;
+        
+}
 
 
 }
