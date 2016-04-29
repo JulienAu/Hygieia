@@ -179,11 +179,11 @@ public class DefaultHudsonClientTests {
         when(rest.exchange(Matchers.any(URI.class), eq(HttpMethod.GET), Matchers.any(HttpEntity.class), eq(String.class)))
                 .thenReturn(new ResponseEntity<>(getJson("buildDetails_full.json"), HttpStatus.OK));
         
-        Build build = hudsonClient.getBuildDetails("http://pic2.s1.p.fti.net/job/WS_31_PACKAGE_KPI/lastSuccessfulBuild/", "http://pic2.s1.p.fti.net/job/WS_31_PACKAGE_KPI/");
+        Build build = hudsonClient.getBuildDetails("http://jenkins.net/job/2483", "http://jenkins.net/job/");
 
         assertThat(build.getTimestamp(), notNullValue());
         assertThat(build.getNumber(), is("2483"));
-        assertThat(build.getBuildUrl(), is("http://pic2.s1.p.fti.net/job/WS_31_PACKAGE_KPI/lastSuccessfulBuild/"));
+        assertThat(build.getBuildUrl(), is("http://jenkins.net/job/2483"));
         assertThat(build.getArtifactVersionNumber(), nullValue());
         assertThat(build.getStartTime(), is(1421281415000L));
         assertThat(build.getEndTime(), is(1421284113495L));

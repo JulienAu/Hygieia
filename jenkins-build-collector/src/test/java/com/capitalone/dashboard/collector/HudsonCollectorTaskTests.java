@@ -11,7 +11,6 @@ import com.capitalone.dashboard.repository.HudsonJobRepository;
 import com.google.common.collect.Sets;
 
 import org.bson.types.ObjectId;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -112,23 +111,6 @@ public class HudsonCollectorTaskTests {
 
         verify(buildRepository, never()).save(build);
     }
-/*
-    @Ignore @Test
-    public void collect_jobEnabled_newBuild_buildAdded() {
-        HudsonCollector collector = collectorWithOneServer();
-        HudsonJob job = hudsonJob("JOB1", SERVER1, "JOB1_URL");
-        Build build = build("JOB1_1", "JOB1_1_URL");
-
-        when(hudsonClient.getInstanceJobs(SERVER1)).thenReturn(oneJobWithBuilds(job, build));
-        when(hudsonJobRepository.findEnabledHudsonJobs(collector.getId(), SERVER1))
-                .thenReturn(Arrays.asList(job));
-        when(buildRepository.findByCollectorItemIdAndNumber(job.getId(), build.getNumber())).thenReturn(null);
-        when(hudsonClient.getBuildDetails(build.getBuildUrl(), null)).thenReturn(build);
-        when(dbComponentRepository.findAll()).thenReturn(components());
-        task.collect(collector);
-
-        verify(buildRepository, times(1)).save(build);
-    }*/
     @Test
     public void collect_jobEnabled_newBuild_buildAdded(){
         HudsonCollector collector = collectorWithOneServer();
