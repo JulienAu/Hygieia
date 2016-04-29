@@ -28,7 +28,7 @@ public class SonarCollectorTask extends CollectorTask<SonarCollector> {
 	private final SonarClient sonarClient;
 	private final SonarSettings sonarSettings;
 	private final ComponentRepository dbComponentRepository;
-	private final static int CLEANUP_INTERVAL = 3600000;
+	private final static int CLEANUP_INTERVAL = /*3600000*/1;
 
 	@Autowired
 	public SonarCollectorTask(TaskScheduler taskScheduler,
@@ -67,9 +67,12 @@ public class SonarCollectorTask extends CollectorTask<SonarCollector> {
 		long start = System.currentTimeMillis();
 
 		// Clean up every hour
+		
 		if ((start - collector.getLastExecuted()) > CLEANUP_INTERVAL) {
 			clean(collector);
 		}
+		
+		
 		for (String instanceUrl : collector.getSonarServers()) {
 			logBanner(instanceUrl);
 
@@ -95,6 +98,7 @@ public class SonarCollectorTask extends CollectorTask<SonarCollector> {
 	 */
 
 	private void clean(SonarCollector collector) {
+		deleteUnwantedJobs(collector);
 		Set<ObjectId> uniqueIDs = new HashSet<>();
 		for (com.capitalone.dashboard.model.Component comp : dbComponentRepository
 				.findAll()) {
@@ -122,6 +126,22 @@ public class SonarCollectorTask extends CollectorTask<SonarCollector> {
 		sonarProjectRepository.save(jobList);
 	}
 
+	private void deleteUnwantedJobs(SonarCollector collector) {
+
+		List<SonarProject> deleteJobList = new ArrayList<>();
+		Set<ObjectId> udId = new HashSet<>();
+		udId.add(collector.getId());
+		for (SonarProject job : sonarProjectRepository.findByCollectorIdIn(udId)) {
+			if (!collector.getSonarServers().contains(job.getInstanceUrl()) ||
+					(!job.getCollectorId().equals(collector.getId()))) {
+				deleteJobList.add(job);
+			}
+		}
+
+		sonarProjectRepository.delete(deleteJobList);
+
+	}
+	
 	private void refreshData(List<SonarProject> sonarProjects) {
 		long start = System.currentTimeMillis();
 		int count = 0;

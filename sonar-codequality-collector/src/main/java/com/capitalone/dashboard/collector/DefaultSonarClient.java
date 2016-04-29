@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
 
-import java.math.BigDecimal;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -82,7 +82,6 @@ public class DefaultSonarClient implements SonarClient {
     public CodeQuality currentCodeQuality(SonarProject project) {
         String url = String.format(
                 project.getInstanceUrl() + URL_RESOURCE_DETAILS, project.getProjectId(), sonarSettings.getMetrics());
-
         try {
             JSONArray jsonArray = parseAsArray(url);
 
@@ -139,25 +138,8 @@ public class DefaultSonarClient implements SonarClient {
         Object obj = json.get(key);
         return obj == null ? null : obj.toString();
     }
-    @SuppressWarnings("unused")
-    private Integer integer(JSONObject json, String key) {
-        Object obj = json.get(key);
-        return obj == null ? null : (Integer) obj;
-    }
 
-    @SuppressWarnings("unused")
-    private BigDecimal decimal(JSONObject json, String key) {
-        Object obj = json.get(key);
-        return obj == null ? null : new BigDecimal(obj.toString());
-    }
-
-    @SuppressWarnings("unused")
-    private Boolean bool(JSONObject json, String key) {
-        Object obj = json.get(key);
-        return obj == null ? null : Boolean.valueOf(obj.toString());
-    }
-
-    private CodeQualityMetricStatus metricStatus(String status) {
+    protected CodeQualityMetricStatus metricStatus(String status) {
         if (StringUtils.isBlank(status)) {
             return CodeQualityMetricStatus.Ok;
         }

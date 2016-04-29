@@ -9,6 +9,9 @@ public class SonarCollector extends Collector {
     public List<String> getSonarServers() {
         return sonarServers;
     }
+    public void setSonarServers(List<String> sonarServers) {
+        this.sonarServers = sonarServers;
+    }
 
     public static SonarCollector prototype(List<String> servers) {
         SonarCollector protoType = new SonarCollector();

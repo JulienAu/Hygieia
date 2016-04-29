@@ -1,0 +1,13 @@
+[{"id":165850,"key":"master:myproject","name":"myproject","scope":"PRJ","qualifier":"TRK","date":"2016-04-26T16:40:02+0000","creationDate":"2015-11-16T10:38:52+0000","lname":"ERIS-MODEL-DEV","version":"199","description":"","msr":[{"key":"ncloc","val":47126.0,"frmt_val":"47,126","alert":null,"alert_text":null},
+{"key":"comment_lines_density","val":16.1,"frmt_val":"16.1%","alert":null,"alert_text":null},
+{"key":"tests","val":463.0,"frmt_val":"463","alert":null,"alert_text":null},
+{"key":"test_errors","val":12.0,"frmt_val":"12","alert":null,"alert_text":null},
+{"key":"test_failures","val":8.0,"frmt_val":"8","alert":null,"alert_text":null},
+{"key":"test_success_density","val":95.7,"frmt_val":"95.7%","alert":null,"alert_text":null},
+{"key":"line_coverage","val":28.5,"frmt_val":"28.5%","alert":null,"alert_text":null},
+{"key":"duplicated_lines_density","val":18.3,"frmt_val":"18.3%","alert":null,"alert_text":null},
+{"key":"violations","val":10337.0,"frmt_val":"10,337","alert":null,"alert_text":null},
+{"key":"blocker_violations","val":0.0,"frmt_val":"0","alert":null,"alert_text":null},
+{"key":"critical_violations","val":0.0,"frmt_val":"0","alert":null,"alert_text":null},
+{"key":"major_violations","val":1459.0,"frmt_val":"1,459","alert":null,"alert_text":null},
+{"key":"sqale_index","val":11200.0,"frmt_val":"23d","alert":null,"alert_text":null}]}]
